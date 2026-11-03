@@ -1,0 +1,15 @@
+services:
+  postgres-event:
+    image: postgres:16-alpine
+    container_name: eventhub-postgres-event
+    environment:
+      POSTGRES_DB: event_service
+      POSTGRES_USER: event_user
+      POSTGRES_PASSWORD: event_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - event_pgdata:/var/lib/postgresql/data
+
+volumes:
+  event_pgdata:
