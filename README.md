@@ -97,6 +97,34 @@ eventhub/
 └── README.md
 ```
 
+## Quick Start
+
+### Prerequisites
+- Docker & Docker Compose
+- Java 25 (or version matching the Gradle Toolchain configuration)
+
+### 1. Start Infrastructure (Databases, etc.)
+```bash
+docker compose up -d
+```
+This starts only the infrastructure containers (PostgreSQL). On the initial startup, PostgreSQL automatically executes the initialization scripts located in `infrastructure/postgres/init/` to create the required tables and indexes.
+
+> **Tip:** If you want to run all services inside Docker instead of running them locally:
+> ```bash
+> docker compose --profile apps up -d --build
+> ```
+
+> **Tip:** If you need to reset the database and re-run initialization scripts from scratch:
+> ```bash
+> docker compose down -v && docker compose up -d
+> ```
+
+### 2. Run Event Service Locally
+```bash
+./event-service/gradlew -p event-service bootRun
+```
+The service connects to PostgreSQL on `localhost:5432` by default using credentials specified in `application.yaml` and `docker-compose.yml`.
+
 ## Development Status
 
 **Current stage:** Initial project setup.

@@ -2,6 +2,7 @@ services:
   postgres-event:
     image: postgres:16-alpine
     container_name: eventhub-postgres-event
+    restart: unless-stopped
     environment:
       POSTGRES_DB: event_service
       POSTGRES_USER: event_user
@@ -10,6 +11,37 @@ services:
       - "5432:5432"
     volumes:
       - event_pgdata:/var/lib/postgresql/data
+      - ./infrastructure/postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U event_user -d event_service"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - eventhub-network
+
+  event-service:
+    profiles:
+      - apps
+    build:
+      context: ./event-service
+      dockerfile: Dockerfile
+    container_name: eventhub-event-service
+    ports:
+      - "8081:8081"
+    environment:
+      DB_HOST: postgres-event
+    depends_on:
+      postgres-event:
+        condition: service_healthy
+    networks:
+      - eventhub-network
+
+networks:
+  eventhub-network:
+    driver: bridge
 
 volumes:
   event_pgdata:
+
+
