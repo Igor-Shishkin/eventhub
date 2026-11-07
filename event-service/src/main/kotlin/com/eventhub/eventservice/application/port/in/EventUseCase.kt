@@ -9,7 +9,8 @@ data class CreateEventCommand(
     val title: String,
     val description: String? = null,
     val location: String? = null,
-    val startTime: Instant? = null,
+    val organizerId: String,
+    val startTime: Instant,
     val endTime: Instant? = null
 )
 

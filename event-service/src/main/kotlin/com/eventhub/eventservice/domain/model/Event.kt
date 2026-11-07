@@ -9,15 +9,17 @@ data class Event(
     val title: String,
     val description: String? = null,
     val location: String? = null,
+    val organizerId: String,
     val status: EventStatus = EventStatus.DRAFT,
-    val startTime: Instant? = null,
+    val startTime: Instant,
     val endTime: Instant? = null,
     val createdAt: Instant = Instant.now(),
     val updatedAt: Instant = Instant.now()
 ) {
     init {
         require(title.isNotBlank()) { "Title cannot be blank" }
-        if (startTime != null && endTime != null) {
+        require(organizerId.isNotBlank()) { "Organizer ID cannot be blank" }
+        if (endTime != null) {
             require(endTime.isAfter(startTime)) { "End time must be after start time" }
         }
     }
@@ -37,6 +39,7 @@ data class Event(
         title = title,
         description = description,
         location = location,
+        organizerId = organizerId,
         status = status.name,
         startTime = startTime,
         endTime = endTime,

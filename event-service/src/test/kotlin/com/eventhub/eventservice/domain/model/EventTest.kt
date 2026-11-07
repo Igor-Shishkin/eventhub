@@ -16,11 +16,13 @@ class EventTest {
             title = "Tech Meetup",
             description = "A meetup for developers",
             location = "Warsaw",
+            organizerId = "org-123",
             startTime = now.plus(1, ChronoUnit.DAYS),
             endTime = now.plus(1, ChronoUnit.DAYS).plus(2, ChronoUnit.HOURS)
         )
 
         assertEquals("Tech Meetup", event.title)
+        assertEquals("org-123", event.organizerId)
         assertEquals(EventStatus.DRAFT, event.status)
         assertNotNull(event.createdAt)
     }
@@ -28,7 +30,14 @@ class EventTest {
     @Test
     fun `should throw exception when title is blank`() {
         assertThrows<IllegalArgumentException> {
-            Event(title = "   ")
+            Event(title = "   ", organizerId = "org-123", startTime = Instant.now())
+        }
+    }
+
+    @Test
+    fun `should throw exception when organizerId is blank`() {
+        assertThrows<IllegalArgumentException> {
+            Event(title = "Tech Meetup", organizerId = "   ", startTime = Instant.now())
         }
     }
 
@@ -38,6 +47,7 @@ class EventTest {
         assertThrows<IllegalArgumentException> {
             Event(
                 title = "Tech Meetup",
+                organizerId = "org-123",
                 startTime = now.plus(2, ChronoUnit.HOURS),
                 endTime = now.plus(1, ChronoUnit.HOURS)
             )
@@ -46,7 +56,7 @@ class EventTest {
 
     @Test
     fun `should publish draft event`() {
-        val event = Event(title = "Tech Meetup")
+        val event = Event(title = "Tech Meetup", organizerId = "org-123", startTime = Instant.now())
         val published = event.publish()
 
         assertEquals(EventStatus.PUBLISHED, published.status)
@@ -54,7 +64,12 @@ class EventTest {
 
     @Test
     fun `should fail to publish when event is already published`() {
-        val event = Event(title = "Tech Meetup", status = EventStatus.PUBLISHED)
+        val event = Event(
+            title = "Tech Meetup",
+            organizerId = "org-123",
+            startTime = Instant.now(),
+            status = EventStatus.PUBLISHED
+        )
 
         assertThrows<IllegalStateException> {
             event.publish()
@@ -63,7 +78,7 @@ class EventTest {
 
     @Test
     fun `should cancel event`() {
-        val event = Event(title = "Tech Meetup")
+        val event = Event(title = "Tech Meetup", organizerId = "org-123", startTime = Instant.now())
         val cancelled = event.cancel()
 
         assertEquals(EventStatus.CANCELLED, cancelled.status)
@@ -71,7 +86,12 @@ class EventTest {
 
     @Test
     fun `should fail to cancel already cancelled event`() {
-        val event = Event(title = "Tech Meetup", status = EventStatus.CANCELLED)
+        val event = Event(
+            title = "Tech Meetup",
+            organizerId = "org-123",
+            startTime = Instant.now(),
+            status = EventStatus.CANCELLED
+        )
 
         assertThrows<IllegalStateException> {
             event.cancel()

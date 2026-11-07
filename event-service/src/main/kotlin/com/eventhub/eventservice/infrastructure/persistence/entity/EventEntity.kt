@@ -15,9 +15,11 @@ data class EventEntity(
     val title: String,
     val description: String?,
     val location: String?,
+    @Column("organizer_id")
+    val organizerId: String,
     val status: String,
     @Column("start_time")
-    val startTime: Instant?,
+    val startTime: Instant,
     @Column("end_time")
     val endTime: Instant?,
     @Column("created_at")
@@ -30,6 +32,7 @@ data class EventEntity(
         title = title,
         description = description,
         location = location,
+        organizerId = organizerId,
         status = EventStatus.valueOf(status),
         startTime = startTime,
         endTime = endTime,

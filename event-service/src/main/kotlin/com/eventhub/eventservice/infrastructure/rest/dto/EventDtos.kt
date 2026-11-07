@@ -4,6 +4,7 @@ import com.eventhub.eventservice.application.port.`in`.CreateEventCommand
 import com.eventhub.eventservice.domain.model.Event
 import com.eventhub.eventservice.domain.model.EventStatus
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import java.time.Instant
 import java.util.UUID
 
@@ -12,14 +13,18 @@ data class CreateEventRequest(
     val title: String,
     val description: String? = null,
     val location: String? = null,
-    val startTime: Instant? = null,
+    @field:NotBlank(message = "Organizer ID cannot be blank")
+    val organizerId: String,
+    @field:NotNull(message = "Start time cannot be null")
+    val startTime: Instant?,
     val endTime: Instant? = null
 ) {
     fun toCommand(): CreateEventCommand = CreateEventCommand(
         title = title,
         description = description,
         location = location,
-        startTime = startTime,
+        organizerId = organizerId,
+        startTime = requireNotNull(startTime) { "Start time is required" },
         endTime = endTime
     )
 }
@@ -29,8 +34,9 @@ data class EventResponse(
     val title: String,
     val description: String?,
     val location: String?,
+    val organizerId: String,
     val status: EventStatus,
-    val startTime: Instant?,
+    val startTime: Instant,
     val endTime: Instant?,
     val createdAt: Instant,
     val updatedAt: Instant
@@ -41,6 +47,7 @@ data class EventResponse(
             title = event.title,
             description = event.description,
             location = event.location,
+            organizerId = event.organizerId,
             status = event.status,
             startTime = event.startTime,
             endTime = event.endTime,

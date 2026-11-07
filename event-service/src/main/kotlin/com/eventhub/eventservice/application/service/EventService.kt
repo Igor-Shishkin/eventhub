@@ -19,6 +19,7 @@ class EventService(
             title = command.title,
             description = command.description,
             location = command.location,
+            organizerId = command.organizerId,
             startTime = command.startTime,
             endTime = command.endTime
         )
