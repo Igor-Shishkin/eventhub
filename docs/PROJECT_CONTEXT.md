@@ -97,9 +97,10 @@ Only necessary event data should be collected. Avoid sending passwords, authenti
 
 | Area | Technology |
 |---|---|
-| Backend | Kotlin, Spring Boot |
+| Backend | Kotlin, Kotlin Coroutines, Spring Boot (WebFlux) |
 | Frontend | Angular, TypeScript |
-| Database | PostgreSQL |
+| Database | PostgreSQL, Spring Data R2DBC |
+| Testing | JUnit 5, MockK, Coroutines Test |
 | Business Messaging | RabbitMQ |
 | Event Streaming | Apache Kafka |
 | Authentication | Keycloak |
@@ -161,6 +162,14 @@ Rules:
 - Services communicate through APIs or messaging.
 - PostgreSQL is used for persistent business data.
 - Separate logical databases or schemas may be used during local development, but service ownership must remain clear.
+
+### 5.3 Service Internal Architecture
+
+Microservices follow **Hexagonal Architecture (Ports and Adapters)**:
+- `domain`: Pure business models, lifecycle transitions, invariants, and repository ports (interfaces).
+- `application`: Use cases (inbound ports), commands, and application services orchestrating domain logic.
+- `infrastructure`: Inbound adapters (REST controllers with Spring WebFlux, DTOs, global exception handling) and outbound adapters (Spring Data R2DBC repositories, messaging publishers).
+- Non-blocking, reactive execution with Kotlin Coroutines (`suspend`, `Flow`).
 
 ## 6. Messaging Architecture
 
@@ -302,11 +311,18 @@ eventhub/
 
 ## 12. Current Project Status
 
-**Status: Initial project setup.**
+**Status: Stage 2 in progress – Event Service foundation implemented.**
 
-The repository has been created. The architecture and technology choices are being defined.
-
-Most components described in this document are planned and have not yet been implemented.
+- `event-service`:
+  - Core domain models (`Event`, `EventRegistration`) with state transition logic.
+  - Hexagonal architecture with inbound ports (`EventUseCase`), service layer, and outbound ports (`EventRepositoryPort`).
+  - Reactive persistence adapter with PostgreSQL and Spring Data R2DBC.
+  - REST API with Spring WebFlux (`/api/v1/events`), RFC 7807 error handling, and validation.
+  - Production & Kubernetes readiness configuration (graceful shutdown, liveness/readiness probes, connection pool).
+  - Unit and API test suite implemented using JUnit 5 and MockK.
+- Next steps in `event-service`:
+  - Event registration use cases and endpoints.
+  - Integration with RabbitMQ (publishing business events like `EventPublished`).
 
 This document should be updated when important architectural or functional decisions change.
 
