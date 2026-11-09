@@ -125,6 +125,21 @@ This starts only the infrastructure containers (PostgreSQL). On the initial star
 ```
 The service connects to PostgreSQL on `localhost:5432` by default using credentials specified in `application.yaml` and `docker-compose.yml`.
 
+## CI/CD
+
+GitHub Actions validates every pull request and push to `main`:
+
+- backend tests run with Java 25 and the Gradle wrapper;
+- frontend dependencies are installed with `npm ci`, then Angular production build and headless browser tests run with Node.js 20;
+- Docker Compose configuration is validated with `docker compose config --quiet`.
+
+A version tag such as `v1.0.0` starts the release workflow. It builds `event-service/Dockerfile` and publishes the image to GitHub Container Registry as:
+
+```text
+ghcr.io/igor-shishkin/eventhub-event-service:v1.0.0
+ghcr.io/igor-shishkin/eventhub-event-service:latest
+```
+
 ### 3. Run Frontend Locally
 ```bash
 cd frontend
