@@ -1,0 +1,136 @@
+<div class="page-container">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Events</h1>
+      <p class="page-subtitle">Browse, publish, and manage events in EventHub</p>
+    </div>
+    <a routerLink="/events/new" class="btn btn-primary">
+      + Create Event
+    </a>
+  </header>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        placeholder="Search by title, description, or location..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        class="search-input"
+      />
+    </div>
+
+    <div class="filter-pills">
+      <button
+        type="button"
+        class="pill"
+        [class.active]="statusFilter() === 'ALL'"
+        (click)="setStatusFilter('ALL')">
+        All
+      </button>
+      <button
+        type="button"
+        class="pill pill-draft"
+        [class.active]="statusFilter() === 'DRAFT'"
+        (click)="setStatusFilter('DRAFT')">
+        Draft
+      </button>
+      <button
+        type="button"
+        class="pill pill-published"
+        [class.active]="statusFilter() === 'PUBLISHED'"
+        (click)="setStatusFilter('PUBLISHED')">
+        Published
+      </button>
+      <button
+        type="button"
+        class="pill pill-cancelled"
+        [class.active]="statusFilter() === 'CANCELLED'"
+        (click)="setStatusFilter('CANCELLED')">
+        Cancelled
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="state-box">
+      <div class="spinner"></div>
+      <p>Loading events...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-danger">
+      <span>{{ errorMessage() }}</span>
+      <button class="btn btn-sm btn-outline" (click)="loadEvents()">Try again</button>
+    </div>
+  } @else if (filteredEvents().length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <h3>No events found</h3>
+      <p>No events match your search criteria.</p>
+      <a routerLink="/events/new" class="btn btn-primary">Create the first event</a>
+    </div>
+  } @else {
+    <div class="events-grid">
+      @for (event of filteredEvents(); track event.id) {
+        <article class="event-card" [routerLink]="['/events', event.id]">
+          <div class="card-header">
+            <span class="status-badge" [class]="'status-' + event.status.toLowerCase()">
+              {{ event.status }}
+            </span>
+            <span class="organizer-chip" title="Organizer ID">
+              👤 {{ event.organizerId }}
+            </span>
+          </div>
+
+          <h2 class="card-title">{{ event.title }}</h2>
+
+          @if (event.description) {
+            <p class="card-description">{{ event.description }}</p>
+          }
+
+          <div class="card-meta">
+            <div class="meta-item">
+              <span class="meta-icon">📍</span>
+              <span>{{ event.location || 'Location not specified' }}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-icon">🕒</span>
+              <span>{{ event.startTime | date: 'yyyy-MM-dd, HH:mm' }}</span>
+              @if (event.endTime) {
+                <span> - {{ event.endTime | date: 'HH:mm' }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <span class="view-link">Details →</span>
+
+            <div class="actions" (click)="$event.stopPropagation()">
+              @if (event.status === 'DRAFT') {
+                <button
+                  type="button"
+                  class="btn btn-sm btn-success"
+                  [disabled]="actionInProgress() === event.id"
+                  (click)="onPublish(event, $event)">
+                  Publish
+                </button>
+              }
+
+              @if (event.status === 'PUBLISHED') {
+                <button
+                  type="button"
+                  class="btn btn-sm btn-danger"
+                  [disabled]="actionInProgress() === event.id"
+                  (click)="onCancel(event, $event)">
+                  Cancel
+                </button>
+              }
+            </div>
+          </div>
+        </article>
+      }
+    </div>
+  }
+</div>
+

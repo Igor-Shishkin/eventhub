@@ -1,0 +1,102 @@
+<div class="page-container">
+  <div class="navigation-bar">
+    <a routerLink="/events" class="back-link">← Back to events</a>
+  </div>
+
+  @if (loading()) {
+    <div class="state-box">
+      <div class="spinner"></div>
+      <p>Loading event details...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="alert alert-danger">
+      <p>{{ errorMessage() }}</p>
+      <a routerLink="/events" class="btn btn-sm btn-outline">Back to events</a>
+    </div>
+  } @else if (event()) {
+    @let item = event()!;
+    <article class="detail-card">
+      <header class="detail-header">
+        <div class="title-section">
+          <span class="status-badge" [class]="'status-' + item.status.toLowerCase()">
+            {{ item.status }}
+          </span>
+          <h1 class="event-title">{{ item.title }}</h1>
+        </div>
+
+        <div class="header-actions">
+          @if (item.status === 'DRAFT') {
+            <button
+              type="button"
+              class="btn btn-success"
+              [disabled]="actionInProgress()"
+              (click)="onPublish()">
+              Publish Event
+            </button>
+          }
+
+          @if (item.status === 'PUBLISHED') {
+            <button
+              type="button"
+              class="btn btn-danger"
+              [disabled]="actionInProgress()"
+              (click)="onCancel()">
+              Cancel Event
+            </button>
+          }
+        </div>
+      </header>
+
+      <div class="detail-grid">
+        <section class="main-content-section">
+          <div class="content-block">
+            <h3>Event Description</h3>
+            <p class="description-text">
+              {{ item.description || 'No description provided for this event.' }}
+            </p>
+          </div>
+        </section>
+
+        <aside class="sidebar">
+          <div class="info-card">
+            <h4>Event Information</h4>
+
+            <div class="info-item">
+              <span class="info-label">📍 Location</span>
+              <span class="info-value">{{ item.location || 'Not specified' }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">🕒 Starts</span>
+              <span class="info-value">{{ item.startTime | date: 'yyyy-MM-dd, HH:mm' }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">🏁 Ends</span>
+              <span class="info-value">
+                {{ item.endTime ? (item.endTime | date: 'yyyy-MM-dd, HH:mm') : 'Not specified' }}
+              </span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">👤 Organizer ID</span>
+              <code class="info-code">{{ item.organizerId }}</code>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">🆔 Event ID</span>
+              <code class="info-code-small">{{ item.id }}</code>
+            </div>
+
+            <div class="info-meta">
+              <small>Created: {{ item.createdAt | date: 'yyyy-MM-dd HH:mm' }}</small>
+              <br>
+              <small>Updated: {{ item.updatedAt | date: 'yyyy-MM-dd HH:mm' }}</small>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </article>
+  }
+</div>
+

@@ -1,0 +1,115 @@
+<div class="page-container">
+  <div class="navigation-bar">
+    <a routerLink="/events" class="back-link">← Back to events</a>
+  </div>
+
+  <div class="form-card">
+    <header class="form-header">
+      <h1 class="form-title">Create New Event</h1>
+      <p class="form-subtitle">Fill in the form to create an event in DRAFT status.</p>
+    </header>
+
+    @if (errorMessage()) {
+      <div class="alert alert-danger">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="event-form">
+      <div class="form-group">
+        <label for="title" class="form-label">Event Title <span class="required">*</span></label>
+        <input
+          id="title"
+          type="text"
+          formControlName="title"
+          placeholder="e.g. Cloud Application Workshop"
+          class="form-control"
+          [class.is-invalid]="form.controls.title.touched && form.controls.title.invalid"
+        />
+        @if (form.controls.title.touched && form.controls.title.errors?.['required']) {
+          <span class="error-text">Title is required.</span>
+        }
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col">
+          <label for="organizerId" class="form-label">Organizer ID <span class="required">*</span></label>
+          <input
+            id="organizerId"
+            type="text"
+            formControlName="organizerId"
+            placeholder="e.g. org-1"
+            class="form-control"
+            [class.is-invalid]="form.controls.organizerId.touched && form.controls.organizerId.invalid"
+          />
+          @if (form.controls.organizerId.touched && form.controls.organizerId.errors?.['required']) {
+            <span class="error-text">Organizer ID is required.</span>
+          }
+        </div>
+
+        <div class="form-group col">
+          <label for="location" class="form-label">Location</label>
+          <input
+            id="location"
+            type="text"
+            formControlName="location"
+            placeholder="e.g. Warsaw, Main Hall or Online"
+            class="form-control"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col">
+          <label for="startTime" class="form-label">Start Date & Time <span class="required">*</span></label>
+          <input
+            id="startTime"
+            type="datetime-local"
+            formControlName="startTime"
+            class="form-control"
+            [class.is-invalid]="form.controls.startTime.touched && form.controls.startTime.invalid"
+          />
+          @if (form.controls.startTime.touched && form.controls.startTime.errors?.['required']) {
+            <span class="error-text">Start date & time is required.</span>
+          }
+        </div>
+
+        <div class="form-group col">
+          <label for="endTime" class="form-label">End Date & Time</label>
+          <input
+            id="endTime"
+            type="datetime-local"
+            formControlName="endTime"
+            class="form-control"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description" class="form-label">Event Description</label>
+        <textarea
+          id="description"
+          rows="5"
+          formControlName="description"
+          placeholder="Detailed event description, agenda, attendee requirements..."
+          class="form-control"
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <a routerLink="/events" class="btn btn-outline">Cancel</a>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="submitting() || (form.touched && form.invalid)">
+          @if (submitting()) {
+            Saving...
+          } @else {
+            Create Event
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
