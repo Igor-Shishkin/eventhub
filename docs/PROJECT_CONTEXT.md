@@ -98,7 +98,7 @@ Only necessary event data should be collected. Avoid sending passwords, authenti
 | Area | Technology |
 |---|---|
 | Backend | Kotlin, Kotlin Coroutines, Spring Boot (WebFlux) |
-| Frontend | Angular, TypeScript |
+| Frontend | Angular, TypeScript, PrimeNG |
 | Database | PostgreSQL, Spring Data R2DBC |
 | Testing | JUnit 5, MockK, Coroutines Test |
 | Business Messaging | RabbitMQ |
@@ -311,18 +311,24 @@ eventhub/
 
 ## 12. Current Project Status
 
-**Status: Stage 2 in progress – Event Service foundation implemented.**
+**Status: Stage 1 & Stage 2 in progress – Event Service & Frontend UI implemented.**
 
 - `event-service`:
   - Core domain models (`Event`, `EventRegistration`) with state transition logic.
-  - Hexagonal architecture with inbound ports (`EventUseCase`), service layer, and outbound ports (`EventRepositoryPort`).
-  - Reactive persistence adapter with PostgreSQL and Spring Data R2DBC.
-  - REST API with Spring WebFlux (`/api/v1/events`), RFC 7807 error handling, and validation.
+  - Hexagonal architecture with inbound ports (`EventUseCase`, `EventRegistrationUseCase`), separate command classes (`CreateEventCommand`, `RegisterAttendeeCommand`, `CancelRegistrationCommand`), and application services (`EventService`, `EventRegistrationService`).
+  - Outbound persistence ports (`EventRepositoryPort`, `EventRegistrationRepositoryPort`) and reactive PostgreSQL adapters using Spring Data R2DBC.
+  - REST APIs with Spring WebFlux (`/api/v1/events`, `/api/v1/events/{id}/registrations`), RFC 7807 error handling, and bean validation.
   - Production & Kubernetes readiness configuration (graceful shutdown, liveness/readiness probes, connection pool).
-  - Unit and API test suite implemented using JUnit 5 and MockK.
-- Next steps in `event-service`:
-  - Event registration use cases and endpoints.
-  - Integration with RabbitMQ (publishing business events like `EventPublished`).
+  - Unit, domain, service, and WebTestClient test suite implemented using JUnit 5, Kotlin Coroutines Test, and MockK.
+- `frontend`:
+  - Angular 18 standalone components styled with PrimeNG 18 and PrimeIcons (Aura preset).
+  - Decomposed components: navbar, event list, event creation, event detail, attendee registrations (`EventRegistrationsComponent`), and event info card (`EventInfoCardComponent`).
+  - Typed API service (`EventService`) integrated with reactive REST endpoints.
+  - Local development proxy (`proxy.conf.json`) forwarding `/api` calls to `http://localhost:8081` without requiring CORS on backend services.
+  - Karma/Jasmine unit tests with headless Chrome execution.
+- Next steps:
+  - Integration with RabbitMQ (publishing business events like `EventPublished`, `EventRegistered`, `EventRegistrationCancelled`).
+  - Volunteer Service implementation.
 
 This document should be updated when important architectural or functional decisions change.
 

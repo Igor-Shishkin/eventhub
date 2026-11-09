@@ -55,45 +55,15 @@
               {{ item.description || 'No description provided for this event.' }}
             </p>
           </div>
+
+          <app-event-registrations
+            [eventId]="item.id"
+            [eventStatus]="item.status">
+          </app-event-registrations>
         </section>
 
         <aside class="sidebar">
-          <div class="info-card">
-            <h4>Event Information</h4>
-
-            <div class="info-item">
-              <span class="info-label">📍 Location</span>
-              <span class="info-value">{{ item.location || 'Not specified' }}</span>
-            </div>
-
-            <div class="info-item">
-              <span class="info-label">🕒 Starts</span>
-              <span class="info-value">{{ item.startTime | date: 'yyyy-MM-dd, HH:mm' }}</span>
-            </div>
-
-            <div class="info-item">
-              <span class="info-label">🏁 Ends</span>
-              <span class="info-value">
-                {{ item.endTime ? (item.endTime | date: 'yyyy-MM-dd, HH:mm') : 'Not specified' }}
-              </span>
-            </div>
-
-            <div class="info-item">
-              <span class="info-label">👤 Organizer ID</span>
-              <code class="info-code">{{ item.organizerId }}</code>
-            </div>
-
-            <div class="info-item">
-              <span class="info-label">🆔 Event ID</span>
-              <code class="info-code-small">{{ item.id }}</code>
-            </div>
-
-            <div class="info-meta">
-              <small>Created: {{ item.createdAt | date: 'yyyy-MM-dd HH:mm' }}</small>
-              <br>
-              <small>Updated: {{ item.updatedAt | date: 'yyyy-MM-dd HH:mm' }}</small>
-            </div>
-          </div>
+          <app-event-info-card [event]="item"></app-event-info-card>
         </aside>
       </div>
     </article>

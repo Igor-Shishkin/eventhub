@@ -2,17 +2,7 @@ package com.eventhub.eventservice.application.port.`in`
 
 import com.eventhub.eventservice.domain.model.Event
 import kotlinx.coroutines.flow.Flow
-import java.time.Instant
 import java.util.UUID
-
-data class CreateEventCommand(
-    val title: String,
-    val description: String? = null,
-    val location: String? = null,
-    val organizerId: String,
-    val startTime: Instant,
-    val endTime: Instant? = null
-)
 
 interface EventUseCase {
     suspend fun createEvent(command: CreateEventCommand): Event
@@ -21,4 +11,6 @@ interface EventUseCase {
     suspend fun publishEvent(id: UUID): Event
     suspend fun cancelEvent(id: UUID): Event
 }
+
+
 

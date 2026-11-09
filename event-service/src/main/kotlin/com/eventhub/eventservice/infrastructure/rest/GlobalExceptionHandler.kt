@@ -1,6 +1,7 @@
 package com.eventhub.eventservice.infrastructure.rest
 
 import com.eventhub.eventservice.domain.exception.EventNotFoundException
+import com.eventhub.eventservice.domain.exception.RegistrationNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -13,6 +14,14 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(EventNotFoundException::class)
     fun handleNotFound(ex: EventNotFoundException): ProblemDetail {
+        val problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message ?: "Resource not found")
+        problem.type = URI.create("about:blank")
+        problem.title = "Not Found"
+        return problem
+    }
+
+    @ExceptionHandler(RegistrationNotFoundException::class)
+    fun handleRegistrationNotFound(ex: RegistrationNotFoundException): ProblemDetail {
         val problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message ?: "Resource not found")
         problem.type = URI.create("about:blank")
         problem.title = "Not Found"

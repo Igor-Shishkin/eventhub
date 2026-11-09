@@ -22,3 +22,18 @@ export interface CreateEventRequest {
   endTime?: string | null;
 }
 
+export type RegistrationStatus = 'REGISTERED' | 'CANCELLED';
+
+export interface EventRegistration {
+  id: string;
+  eventId: string;
+  userId: string;
+  status: RegistrationStatus;
+  registeredAt: string;
+}
+
+export interface RegisterAttendeeRequest {
+  userId: string;
+}
+
+

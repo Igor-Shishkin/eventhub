@@ -22,7 +22,7 @@ The goal of the project is to build a scalable application while exploring moder
 | Area | Technology |
 |---|---|
 | Backend | Kotlin, Spring Boot |
-| Frontend | Angular, TypeScript |
+| Frontend | Angular, TypeScript, PrimeNG |
 | Database | PostgreSQL |
 | Business Messaging | RabbitMQ |
 | Event Streaming & Analytics | Apache Kafka |
@@ -125,9 +125,17 @@ This starts only the infrastructure containers (PostgreSQL). On the initial star
 ```
 The service connects to PostgreSQL on `localhost:5432` by default using credentials specified in `application.yaml` and `docker-compose.yml`.
 
+### 3. Run Frontend Locally
+```bash
+cd frontend
+npm install
+npm start
+```
+The application will be accessible at `http://localhost:4200`. API requests to `/api` are automatically proxied to `http://localhost:8081` via `proxy.conf.json`.
+
 ## Development Status
 
-**Current stage:** Initial project setup.
+**Current stage:** Stage 1 & 2 in progress – Event Service REST API & Frontend UI implemented.
 
 The project is being developed incrementally.
 

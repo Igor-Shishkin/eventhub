@@ -1,0 +1,77 @@
+<div class="content-block registrations-section">
+  <h3>Event Registrations</h3>
+
+  @if (successMessage()) {
+    <p-message severity="success" [text]="successMessage()!" styleClass="w-full mb-3"></p-message>
+  }
+
+  @if (errorMessage()) {
+    <p-message severity="error" [text]="errorMessage()!" styleClass="w-full mb-3"></p-message>
+  }
+
+  @if (eventStatus === 'PUBLISHED') {
+    <div class="registration-form">
+      <h4>Register for this Event</h4>
+      <div class="form-row">
+        <input
+          pInputText
+          type="text"
+          [(ngModel)]="userId"
+          placeholder="Enter your User ID / Username"
+          class="user-input"
+          [disabled]="actionInProgress()"
+        />
+        <p-button
+          label="Register Now"
+          icon="pi pi-check"
+          [loading]="actionInProgress()"
+          [disabled]="actionInProgress() || !userId().trim()"
+          (onClick)="onRegister()">
+        </p-button>
+      </div>
+    </div>
+  } @else {
+    <p class="text-muted">Registration is only available for published events.</p>
+  }
+
+  <div class="registrations-list">
+    <h4>Current Attendees ({{ registrations().length }})</h4>
+    @if (loading()) {
+      <div class="loading-state">
+        <p-progressSpinner styleClass="w-2rem h-2rem" strokeWidth="4"></p-progressSpinner>
+        <span>Loading attendees...</span>
+      </div>
+    } @else if (registrations().length === 0) {
+      <p class="text-muted">No attendees registered yet. Be the first one!</p>
+    } @else {
+      <ul class="attendee-list">
+        @for (reg of registrations(); track reg.id) {
+          <li class="attendee-item">
+            <div class="attendee-info">
+              <strong>{{ reg.userId }}</strong>
+              <p-tag
+                [value]="reg.status"
+                [severity]="reg.status === 'REGISTERED' ? 'success' : 'danger'">
+              </p-tag>
+              <small class="text-muted">({{ reg.registeredAt | date: 'short' }})</small>
+            </div>
+            @if (reg.status === 'REGISTERED') {
+              <p-button
+                label="Cancel"
+                icon="pi pi-times"
+                severity="danger"
+                [outlined]="true"
+                size="small"
+                [loading]="actionInProgress()"
+                (onClick)="onCancelRegistration(reg.userId)">
+              </p-button>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</div>
+
+
+

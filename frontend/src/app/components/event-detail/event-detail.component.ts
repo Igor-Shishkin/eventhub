@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { EventService } from '../../services/event.service';
 import { EventItem } from '../../models/event.model';
+import { EventRegistrationsComponent } from '../event-registrations/event-registrations.component';
+import { EventInfoCardComponent } from '../event-info-card/event-info-card.component';
 
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, EventRegistrationsComponent, EventInfoCardComponent],
   templateUrl: './event-detail.component.html',
   styleUrl: './event-detail.component.scss'
 })
@@ -93,3 +95,8 @@ export class EventDetailComponent implements OnInit {
     });
   }
 }
+
+
+
+
+

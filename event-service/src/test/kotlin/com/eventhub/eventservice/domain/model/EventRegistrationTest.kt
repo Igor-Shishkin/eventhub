@@ -44,16 +44,30 @@ class EventRegistrationTest {
     }
 
     @Test
-    fun `should fail to cancel already cancelled registration`() {
+    fun `should re-register cancelled registration`() {
         val registration = EventRegistration(
             eventId = UUID.randomUUID(),
             userId = "user-123",
             status = RegistrationStatus.CANCELLED
         )
 
+        val reRegistered = registration.reRegister()
+        assertEquals(RegistrationStatus.REGISTERED, reRegistered.status)
+    }
+
+    @Test
+    fun `should fail to re-register active registration`() {
+        val registration = EventRegistration(
+            eventId = UUID.randomUUID(),
+            userId = "user-123",
+            status = RegistrationStatus.REGISTERED
+        )
+
         assertThrows<IllegalStateException> {
-            registration.cancel()
+            registration.reRegister()
         }
     }
 }
+
+
 

@@ -1,34 +1,43 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, ButtonModule],
   template: `
     <nav class="navbar">
       <div class="nav-container">
         <a routerLink="/events" class="brand">
-          <span class="brand-badge">⚡</span>
+          <i class="pi pi-bolt brand-icon"></i>
           <span class="brand-name">EventHub</span>
         </a>
         <div class="nav-links">
-          <a routerLink="/events" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-            Events
-          </a>
-          <a routerLink="/events/new" routerLinkActive="active" class="btn-create">
-            + New Event
-          </a>
+          <p-button
+            routerLink="/events"
+            label="Events"
+            icon="pi pi-calendar"
+            [text]="true"
+            severity="contrast"
+            size="small">
+          </p-button>
+          <p-button
+            routerLink="/events/new"
+            label="New Event"
+            icon="pi pi-plus"
+            severity="primary"
+            size="small">
+          </p-button>
         </div>
       </div>
     </nav>
   `,
   styles: [`
     .navbar {
-      background: #1e293b;
-      color: #f8fafc;
-      padding: 0.85rem 1.5rem;
-      border-bottom: 1px solid #334155;
+      background: #0f172a;
+      padding: 0.75rem 1.5rem;
+      border-bottom: 1px solid #1e293b;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -49,39 +58,18 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       font-weight: 700;
       font-size: 1.25rem;
     }
-    .brand-badge {
-      font-size: 1.3rem;
+    .brand-icon {
+      font-size: 1.35rem;
+      color: #3b82f6;
     }
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 1.25rem;
-    }
-    .nav-link {
-      color: #94a3b8;
-      text-decoration: none;
-      font-weight: 500;
-      padding: 0.4rem 0.75rem;
-      border-radius: 6px;
-      transition: all 0.2s ease;
-    }
-    .nav-link:hover, .nav-link.active {
-      color: #ffffff;
-      background: #334155;
-    }
-    .btn-create {
-      background: #3b82f6;
-      color: #ffffff;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background 0.2s ease;
-    }
-    .btn-create:hover {
-      background: #2563eb;
+      gap: 0.75rem;
     }
   `]
 })
 export class NavbarComponent {}
+
+
 

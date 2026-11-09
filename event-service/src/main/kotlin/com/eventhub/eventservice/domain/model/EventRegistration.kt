@@ -20,6 +20,11 @@ data class EventRegistration(
         return copy(status = RegistrationStatus.CANCELLED)
     }
 
+    fun reRegister(): EventRegistration {
+        check(status == RegistrationStatus.CANCELLED) { "Registration is already active" }
+        return copy(status = RegistrationStatus.REGISTERED, registeredAt = Instant.now())
+    }
+
     fun toEntity(): EventRegistrationEntity = EventRegistrationEntity(
         id = id,
         eventId = eventId,

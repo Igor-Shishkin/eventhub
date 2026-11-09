@@ -1,0 +1,37 @@
+<div class="info-card">
+  <h4>Event Information</h4>
+
+  <div class="info-item">
+    <span class="info-label">📍 Location</span>
+    <span class="info-value">{{ event.location || 'Not specified' }}</span>
+  </div>
+
+  <div class="info-item">
+    <span class="info-label">🕒 Starts</span>
+    <span class="info-value">{{ event.startTime | date: 'yyyy-MM-dd, HH:mm' }}</span>
+  </div>
+
+  <div class="info-item">
+    <span class="info-label">🏁 Ends</span>
+    <span class="info-value">
+      {{ event.endTime ? (event.endTime | date: 'yyyy-MM-dd, HH:mm') : 'Not specified' }}
+    </span>
+  </div>
+
+  <div class="info-item">
+    <span class="info-label">👤 Organizer ID</span>
+    <code class="info-code">{{ event.organizerId }}</code>
+  </div>
+
+  <div class="info-item">
+    <span class="info-label">🆔 Event ID</span>
+    <code class="info-code-small">{{ event.id }}</code>
+  </div>
+
+  <div class="info-meta">
+    <small>Created: {{ event.createdAt | date: 'yyyy-MM-dd HH:mm' }}</small>
+    <br>
+    <small>Updated: {{ event.updatedAt | date: 'yyyy-MM-dd HH:mm' }}</small>
+  </div>
+</div>
+
