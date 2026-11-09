@@ -2,13 +2,25 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
+import { MessageModule } from 'primeng/message';
 import { EventService } from '../../services/event.service';
 import { CreateEventRequest } from '../../models/event.model';
 
 @Component({
   selector: 'app-event-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    ButtonModule,
+    InputTextModule,
+    TextareaModule,
+    MessageModule
+  ],
   templateUrl: './event-create.component.html',
   styleUrl: './event-create.component.scss'
 })

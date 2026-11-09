@@ -30,6 +30,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+input, textarea, select {
+  color: var(--text-main);
+}
+
 .main-content {
   min-height: calc(100vh - 65px);
 }

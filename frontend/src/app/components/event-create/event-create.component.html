@@ -10,9 +10,7 @@
     </header>
 
     @if (errorMessage()) {
-      <div class="alert alert-danger">
-        {{ errorMessage() }}
-      </div>
+      <p-message severity="error" [text]="errorMessage()!" styleClass="w-full mb-3"></p-message>
     }
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="event-form">
@@ -20,11 +18,13 @@
         <label for="title" class="form-label">Event Title <span class="required">*</span></label>
         <input
           id="title"
+          pInputText
           type="text"
           formControlName="title"
           placeholder="e.g. Cloud Application Workshop"
-          class="form-control"
-          [class.is-invalid]="form.controls.title.touched && form.controls.title.invalid"
+          class="w-full"
+          [class.ng-invalid]="form.controls.title.touched && form.controls.title.invalid"
+          [class.ng-dirty]="form.controls.title.touched"
         />
         @if (form.controls.title.touched && form.controls.title.errors?.['required']) {
           <span class="error-text">Title is required.</span>
@@ -36,11 +36,13 @@
           <label for="organizerId" class="form-label">Organizer ID <span class="required">*</span></label>
           <input
             id="organizerId"
+            pInputText
             type="text"
             formControlName="organizerId"
             placeholder="e.g. org-1"
-            class="form-control"
-            [class.is-invalid]="form.controls.organizerId.touched && form.controls.organizerId.invalid"
+            class="w-full"
+            [class.ng-invalid]="form.controls.organizerId.touched && form.controls.organizerId.invalid"
+            [class.ng-dirty]="form.controls.organizerId.touched"
           />
           @if (form.controls.organizerId.touched && form.controls.organizerId.errors?.['required']) {
             <span class="error-text">Organizer ID is required.</span>
@@ -51,10 +53,11 @@
           <label for="location" class="form-label">Location</label>
           <input
             id="location"
+            pInputText
             type="text"
             formControlName="location"
             placeholder="e.g. Warsaw, Main Hall or Online"
-            class="form-control"
+            class="w-full"
           />
         </div>
       </div>
@@ -64,10 +67,12 @@
           <label for="startTime" class="form-label">Start Date & Time <span class="required">*</span></label>
           <input
             id="startTime"
+            pInputText
             type="datetime-local"
             formControlName="startTime"
-            class="form-control"
-            [class.is-invalid]="form.controls.startTime.touched && form.controls.startTime.invalid"
+            class="w-full"
+            [class.ng-invalid]="form.controls.startTime.touched && form.controls.startTime.invalid"
+            [class.ng-dirty]="form.controls.startTime.touched"
           />
           @if (form.controls.startTime.touched && form.controls.startTime.errors?.['required']) {
             <span class="error-text">Start date & time is required.</span>
@@ -78,9 +83,10 @@
           <label for="endTime" class="form-label">End Date & Time</label>
           <input
             id="endTime"
+            pInputText
             type="datetime-local"
             formControlName="endTime"
-            class="form-control"
+            class="w-full"
           />
         </div>
       </div>
@@ -89,25 +95,29 @@
         <label for="description" class="form-label">Event Description</label>
         <textarea
           id="description"
+          pTextarea
           rows="5"
           formControlName="description"
           placeholder="Detailed event description, agenda, attendee requirements..."
-          class="form-control"
+          class="w-full"
+          [autoResize]="true"
         ></textarea>
       </div>
 
       <div class="form-actions">
-        <a routerLink="/events" class="btn btn-outline">Cancel</a>
-        <button
+        <p-button
+          routerLink="/events"
+          label="Cancel"
+          [outlined]="true"
+          severity="secondary">
+        </p-button>
+        <p-button
           type="submit"
-          class="btn btn-primary"
+          label="Create Event"
+          icon="pi pi-check"
+          [loading]="submitting()"
           [disabled]="submitting() || (form.touched && form.invalid)">
-          @if (submitting()) {
-            Saving...
-          } @else {
-            Create Event
-          }
-        </button>
+        </p-button>
       </div>
     </form>
   </div>
