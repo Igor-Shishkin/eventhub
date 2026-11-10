@@ -121,7 +121,7 @@ This starts only the infrastructure containers (PostgreSQL). On the initial star
 
 ## Local demo data
 
-A fresh PostgreSQL volume is initialized with four demo events: two published events, one draft event, and one cancelled event. The dataset also includes registrations for `demo-attendee-1`, `demo-attendee-2`, `demo-attendee-3`, and `demo-attendee-4`.
+A fresh PostgreSQL volume is initialized with four demo events: two published events, one draft event, and one cancelled event. The dataset also includes eight fictional attendees: `anna.nowak`, `piotr.kowalski`, `maria.zielinska`, `pawel.lewandowski`, `karolina.wojcik`, `mateusz.kaczmarek`, `olga.mazur`, and `jan.wojciechowski`.
 
 The initialization scripts run only when PostgreSQL creates the database volume for the first time. To recreate the demo data, reset the local volume and start the infrastructure again:
 

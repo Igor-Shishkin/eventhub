@@ -65,29 +65,57 @@ VALUES
     (
         'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         '11111111-1111-4111-8111-111111111111',
-        'demo-attendee-1',
+        'anna.nowak',
         'REGISTERED',
         '2026-11-01T10:00:00Z'
     ),
     (
         'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         '11111111-1111-4111-8111-111111111111',
-        'demo-attendee-2',
+        'piotr.kowalski',
         'REGISTERED',
-        '2026-11-02T12:30:00Z'
+        '2026-11-01T12:30:00Z'
     ),
     (
         'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+        '11111111-1111-4111-8111-111111111111',
+        'maria.zielinska',
+        'REGISTERED',
+        '2026-11-02T09:15:00Z'
+    ),
+    (
+        'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        '11111111-1111-4111-8111-111111111111',
+        'pawel.lewandowski',
+        'CANCELLED',
+        '2026-11-02T09:30:00Z'
+    ),
+    (
+        'eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee',
         '22222222-2222-4222-8222-222222222222',
-        'demo-attendee-3',
+        'karolina.wojcik',
+        'REGISTERED',
+        '2026-11-03T08:00:00Z'
+    ),
+    (
+        'ffffffff-ffff-4fff-8fff-ffffffffffff',
+        '22222222-2222-4222-8222-222222222222',
+        'mateusz.kaczmarek',
         'REGISTERED',
         '2026-11-03T09:15:00Z'
     ),
     (
-        'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+        '12121212-1212-4121-8121-121212121212',
         '22222222-2222-4222-8222-222222222222',
-        'demo-attendee-4',
+        'olga.mazur',
+        'REGISTERED',
+        '2026-11-04T11:45:00Z'
+    ),
+    (
+        '13131313-1313-4131-8131-131313131313',
+        '22222222-2222-4222-8222-222222222222',
+        'jan.wojciechowski',
         'CANCELLED',
-        '2026-11-03T09:30:00Z'
+        '2026-11-04T12:00:00Z'
     )
 ON CONFLICT DO NOTHING;
