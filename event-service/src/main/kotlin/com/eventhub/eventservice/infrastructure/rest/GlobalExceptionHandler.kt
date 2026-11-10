@@ -2,6 +2,7 @@ package com.eventhub.eventservice.infrastructure.rest
 
 import com.eventhub.eventservice.domain.exception.EventNotFoundException
 import com.eventhub.eventservice.domain.exception.RegistrationNotFoundException
+import com.eventhub.eventservice.domain.exception.UnauthorizedEventOperationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -25,6 +26,14 @@ class GlobalExceptionHandler {
         val problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.message ?: "Resource not found")
         problem.type = URI.create("about:blank")
         problem.title = "Not Found"
+        return problem
+    }
+
+    @ExceptionHandler(UnauthorizedEventOperationException::class)
+    fun handleUnauthorizedOperation(ex: UnauthorizedEventOperationException): ProblemDetail {
+        val problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.message ?: "Forbidden")
+        problem.type = URI.create("about:blank")
+        problem.title = "Forbidden"
         return problem
     }
 
@@ -54,4 +63,3 @@ class GlobalExceptionHandler {
         return problem
     }
 }
-

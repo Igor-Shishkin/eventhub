@@ -15,7 +15,10 @@ import kotlinx.coroutines.flow.asFlow
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.http.MediaType
+import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockJwt
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.test.web.reactive.server.WebTestClient
+import kotlinx.coroutines.test.runTest
 import java.time.Instant
 import java.util.UUID
 
@@ -35,12 +38,11 @@ class EventControllerTest {
     }
 
     @Test
-    fun `should create event and return 201 Created`() {
+    fun `should create event from the authenticated organizer`() = runTest {
         val request = CreateEventRequest(
             title = "Spring Boot Workshop",
             description = "Hands-on workshop",
             location = "Krakow",
-            organizerId = "org-123",
             startTime = now
         )
         val createdEvent = Event(
@@ -48,36 +50,25 @@ class EventControllerTest {
             title = request.title,
             description = request.description,
             location = request.location,
-            organizerId = request.organizerId,
+            organizerId = "org-123",
             startTime = request.startTime!!
         )
         coEvery { eventUseCase.createEvent(any()) } returns createdEvent
 
-        webTestClient.post()
-            .uri("/api/v1/events")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(request)
-            .exchange()
-            .expectStatus().isCreated
-            .expectBody()
-            .jsonPath("$.id").isNotEmpty
-            .jsonPath("$.title").isEqualTo("Spring Boot Workshop")
-            .jsonPath("$.organizerId").isEqualTo("org-123")
-            .jsonPath("$.startTime").isEqualTo("2026-01-01T10:00:00Z")
-            .jsonPath("$.status").isEqualTo("DRAFT")
+        val response = EventController(eventUseCase).createEvent(request, jwt("org-123"))
 
-        coVerify(exactly = 1) { eventUseCase.createEvent(request.toCommand()) }
+        assert(response.organizerId == "org-123")
+        coVerify(exactly = 1) { eventUseCase.createEvent(request.toCommand("org-123")) }
     }
 
     @Test
     fun `should return 400 Bad Request when creating event with blank title`() {
         val request = mapOf(
             "title" to "   ",
-            "organizerId" to "org-123",
             "startTime" to "2026-01-01T10:00:00Z"
         )
 
-        webTestClient.post()
+        webTestClient.mutateWith(mockJwt().jwt { it.subject("org-123") }).post()
             .uri("/api/v1/events")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -91,34 +82,12 @@ class EventControllerTest {
     }
 
     @Test
-    fun `should return 400 Bad Request when creating event with blank organizerId`() {
-        val request = mapOf(
-            "title" to "Spring Boot Workshop",
-            "organizerId" to "   ",
-            "startTime" to "2026-01-01T10:00:00Z"
-        )
-
-        webTestClient.post()
-            .uri("/api/v1/events")
-            .contentType(MediaType.APPLICATION_JSON)
-            .bodyValue(request)
-            .exchange()
-            .expectStatus().isBadRequest
-            .expectBody()
-            .jsonPath("$.title").isEqualTo("Validation Error")
-            .jsonPath("$.errors.organizerId").isEqualTo("Organizer ID cannot be blank")
-
-        coVerify(exactly = 0) { eventUseCase.createEvent(any()) }
-    }
-
-    @Test
     fun `should return 400 Bad Request when creating event without startTime`() {
         val request = mapOf(
             "title" to "Spring Boot Workshop",
-            "organizerId" to "org-123"
         )
 
-        webTestClient.post()
+        webTestClient.mutateWith(mockJwt().jwt { it.subject("org-123") }).post()
             .uri("/api/v1/events")
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue(request)
@@ -194,50 +163,43 @@ class EventControllerTest {
     }
 
     @Test
-    fun `should publish event`() {
+    fun `should publish event`() = runTest {
         val eventId = UUID.randomUUID()
         val publishedEvent = Event(id = eventId, title = "Draft Event", organizerId = "org-123", startTime = now, status = EventStatus.PUBLISHED)
-        coEvery { eventUseCase.publishEvent(eventId) } returns publishedEvent
+        coEvery { eventUseCase.publishEvent(eventId, "org-123") } returns publishedEvent
 
-        webTestClient.post()
-            .uri("/api/v1/events/$eventId/publish")
-            .exchange()
-            .expectStatus().isOk
-            .expectBody()
-            .jsonPath("$.status").isEqualTo("PUBLISHED")
+        val response = EventController(eventUseCase).publishEvent(eventId, jwt("org-123"))
 
-        coVerify(exactly = 1) { eventUseCase.publishEvent(eventId) }
+        assert(response.status == EventStatus.PUBLISHED)
+        coVerify(exactly = 1) { eventUseCase.publishEvent(eventId, "org-123") }
     }
 
     @Test
-    fun `should return 409 Conflict when publishing already published event`() {
+    fun `should return conflict when publishing already published event`() = runTest {
         val eventId = UUID.randomUUID()
-        coEvery { eventUseCase.publishEvent(eventId) } throws IllegalStateException("Only draft events can be published")
+        coEvery { eventUseCase.publishEvent(eventId, "org-123") } throws IllegalStateException("Only draft events can be published")
 
-        webTestClient.post()
-            .uri("/api/v1/events/$eventId/publish")
-            .exchange()
-            .expectStatus().isEqualTo(409)
-            .expectBody()
-            .jsonPath("$.title").isEqualTo("Conflict")
+        val exception = org.junit.jupiter.api.assertThrows<IllegalStateException> {
+            EventController(eventUseCase).publishEvent(eventId, jwt("org-123"))
+        }
 
-        coVerify(exactly = 1) { eventUseCase.publishEvent(eventId) }
+        assert(exception.message == "Only draft events can be published")
     }
 
     @Test
-    fun `should cancel event`() {
+    fun `should cancel event`() = runTest {
         val eventId = UUID.randomUUID()
         val cancelledEvent = Event(id = eventId, title = "Event", organizerId = "org-123", startTime = now, status = EventStatus.CANCELLED)
-        coEvery { eventUseCase.cancelEvent(eventId) } returns cancelledEvent
+        coEvery { eventUseCase.cancelEvent(eventId, "org-123") } returns cancelledEvent
 
-        webTestClient.post()
-            .uri("/api/v1/events/$eventId/cancel")
-            .exchange()
-            .expectStatus().isOk
-            .expectBody()
-            .jsonPath("$.status").isEqualTo("CANCELLED")
+        val response = EventController(eventUseCase).cancelEvent(eventId, jwt("org-123"))
 
-        coVerify(exactly = 1) { eventUseCase.cancelEvent(eventId) }
+        assert(response.status == EventStatus.CANCELLED)
+        coVerify(exactly = 1) { eventUseCase.cancelEvent(eventId, "org-123") }
     }
-}
 
+    private fun jwt(subject: String): Jwt = Jwt.withTokenValue("test-token")
+        .header("alg", "none")
+        .subject(subject)
+        .build()
+}

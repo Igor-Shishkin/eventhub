@@ -17,7 +17,6 @@ export interface CreateEventRequest {
   title: string;
   description?: string | null;
   location?: string | null;
-  organizerId: string;
   startTime: string;
   endTime?: string | null;
 }
@@ -35,5 +34,4 @@ export interface EventRegistration {
 export interface RegisterAttendeeRequest {
   userId: string;
 }
-
 

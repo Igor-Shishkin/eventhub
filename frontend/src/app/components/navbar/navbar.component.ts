@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { KeycloakService } from '../../auth/keycloak.service';
 
 @Component({
   selector: 'app-navbar',
@@ -22,13 +23,34 @@ import { ButtonModule } from 'primeng/button';
             severity="contrast"
             size="small">
           </p-button>
-          <p-button
-            routerLink="/events/new"
-            label="New Event"
-            icon="pi pi-plus"
-            severity="primary"
-            size="small">
-          </p-button>
+          @if (keycloak.authenticated()) {
+            <span class="user-name">{{ keycloak.username() }}</span>
+            @if (keycloak.isOrganizer()) {
+              <p-button
+                routerLink="/events/new"
+                label="New Event"
+                icon="pi pi-plus"
+                severity="primary"
+                size="small">
+              </p-button>
+            }
+            <p-button
+              label="Logout"
+              icon="pi pi-sign-out"
+              [text]="true"
+              severity="contrast"
+              size="small"
+              (onClick)="logout()">
+            </p-button>
+          } @else {
+            <p-button
+              label="Login"
+              icon="pi pi-sign-in"
+              severity="primary"
+              size="small"
+              (onClick)="login()">
+            </p-button>
+          }
         </div>
       </div>
     </nav>
@@ -67,9 +89,22 @@ import { ButtonModule } from 'primeng/button';
       align-items: center;
       gap: 0.75rem;
     }
+    .user-name {
+      color: #cbd5e1;
+      font-size: 0.875rem;
+    }
   `]
 })
-export class NavbarComponent {}
+export class NavbarComponent {
+  readonly keycloak = inject(KeycloakService);
 
+  login(): void {
+    void this.keycloak.login();
+  }
+
+  logout(): void {
+    void this.keycloak.logout();
+  }
+}
 
 

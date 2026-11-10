@@ -7,6 +7,8 @@ import jakarta.validation.Valid
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -24,8 +26,13 @@ class EventController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    suspend fun createEvent(@Valid @RequestBody request: CreateEventRequest): EventResponse {
-        val event = eventUseCase.createEvent(request.toCommand())
+    suspend fun createEvent(
+        @Valid @RequestBody request: CreateEventRequest,
+        @AuthenticationPrincipal jwt: Jwt
+    ): EventResponse {
+        val event = eventUseCase.createEvent(
+            request.toCommand(requireNotNull(jwt.subject))
+        )
         return EventResponse.from(event)
     }
 
@@ -41,15 +48,20 @@ class EventController(
     }
 
     @PostMapping("/{id}/publish")
-    suspend fun publishEvent(@PathVariable id: UUID): EventResponse {
-        val event = eventUseCase.publishEvent(id)
+    suspend fun publishEvent(
+        @PathVariable id: UUID,
+        @AuthenticationPrincipal jwt: Jwt
+    ): EventResponse {
+        val event = eventUseCase.publishEvent(id, requireNotNull(jwt.subject))
         return EventResponse.from(event)
     }
 
     @PostMapping("/{id}/cancel")
-    suspend fun cancelEvent(@PathVariable id: UUID): EventResponse {
-        val event = eventUseCase.cancelEvent(id)
+    suspend fun cancelEvent(
+        @PathVariable id: UUID,
+        @AuthenticationPrincipal jwt: Jwt
+    ): EventResponse {
+        val event = eventUseCase.cancelEvent(id, requireNotNull(jwt.subject))
         return EventResponse.from(event)
     }
 }
-

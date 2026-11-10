@@ -1,0 +1,78 @@
+{
+  "realm": "eventhub",
+  "enabled": true,
+  "registrationAllowed": false,
+  "roles": {
+    "realm": [
+      {
+        "name": "USER",
+        "description": "Can participate in events and volunteer activities"
+      },
+      {
+        "name": "ORGANIZER",
+        "description": "Can create and manage owned events"
+      },
+      {
+        "name": "ADMIN",
+        "description": "Can administer the platform"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "eventhub-frontend",
+      "name": "EventHub Angular frontend",
+      "enabled": true,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://localhost:4200/*"
+      ],
+      "webOrigins": [
+        "http://localhost:4200"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "organizer",
+      "enabled": true,
+      "email": "organizer@example.com",
+      "firstName": "Demo",
+      "lastName": "Organizer",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "organizer",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER",
+        "ORGANIZER"
+      ]
+    },
+    {
+      "username": "user",
+      "enabled": true,
+      "email": "user@example.com",
+      "firstName": "Demo",
+      "lastName": "User",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "user",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER"
+      ]
+    }
+  ]
+}

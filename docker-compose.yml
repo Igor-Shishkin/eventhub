@@ -37,11 +37,24 @@ services:
     networks:
       - eventhub-network
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.6
+    container_name: eventhub-keycloak
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./infrastructure/keycloak:/opt/keycloak/data/import:ro
+    networks:
+      - eventhub-network
+
 networks:
   eventhub-network:
     driver: bridge
 
 volumes:
   event_pgdata:
-
 

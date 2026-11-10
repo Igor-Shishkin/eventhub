@@ -8,9 +8,8 @@ interface EventUseCase {
     suspend fun createEvent(command: CreateEventCommand): Event
     suspend fun getEventById(id: UUID): Event
     fun getAllEvents(): Flow<Event>
-    suspend fun publishEvent(id: UUID): Event
-    suspend fun cancelEvent(id: UUID): Event
+    suspend fun publishEvent(id: UUID, organizerId: String): Event
+    suspend fun cancelEvent(id: UUID, organizerId: String): Event
 }
-
 
 

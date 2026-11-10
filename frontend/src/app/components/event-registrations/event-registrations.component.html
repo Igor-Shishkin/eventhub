@@ -11,30 +11,41 @@
 
   @if (eventStatus === 'PUBLISHED') {
     <div class="registration-form">
-      <h4>Register for this Event</h4>
-      <div class="form-row">
-        <input
-          pInputText
-          type="text"
-          [(ngModel)]="userId"
-          placeholder="Enter your User ID / Username"
-          class="user-input"
-          [disabled]="actionInProgress()"
-        />
+      <h4>Your participation</h4>
+      @if (!keycloak.authenticated()) {
         <p-button
-          label="Register Now"
+          label="Login to register"
+          icon="pi pi-sign-in"
+          [disabled]="actionInProgress()"
+          (onClick)="keycloak.login()">
+        </p-button>
+      } @else if (myRegistration()?.status === 'REGISTERED') {
+        <p class="text-muted">You are registered for this event.</p>
+        <p-button
+          label="Cancel registration"
+          icon="pi pi-times"
+          severity="danger"
+          [outlined]="true"
+          [loading]="actionInProgress()"
+          [disabled]="actionInProgress()"
+          (onClick)="onCancelRegistration()">
+        </p-button>
+      } @else {
+        <p-button
+          label="Register for this event"
           icon="pi pi-check"
           [loading]="actionInProgress()"
-          [disabled]="actionInProgress() || !userId().trim()"
+          [disabled]="actionInProgress()"
           (onClick)="onRegister()">
         </p-button>
-      </div>
+      }
     </div>
   } @else {
     <p class="text-muted">Registration is only available for published events.</p>
   }
 
-  <div class="registrations-list">
+  @if (keycloak.isOrganizer()) {
+    <div class="registrations-list">
     <h4>Current Attendees ({{ registrations().length }})</h4>
     @if (loading()) {
       <div class="loading-state">
@@ -55,23 +66,11 @@
               </p-tag>
               <small class="text-muted">({{ reg.registeredAt | date: 'short' }})</small>
             </div>
-            @if (reg.status === 'REGISTERED') {
-              <p-button
-                label="Cancel"
-                icon="pi pi-times"
-                severity="danger"
-                [outlined]="true"
-                size="small"
-                [loading]="actionInProgress()"
-                (onClick)="onCancelRegistration(reg.userId)">
-              </p-button>
-            }
           </li>
         }
       </ul>
     }
-  </div>
+    </div>
+  }
 </div>
-
-
 

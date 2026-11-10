@@ -114,7 +114,7 @@ class EventServiceTest {
         coEvery { eventRepository.findById(eventId) } returns draftEvent
         coEvery { eventRepository.save(any()) } returns publishedEvent
 
-        val published = eventService.publishEvent(eventId)
+        val published = eventService.publishEvent(eventId, "org-123")
 
         assertEquals(EventStatus.PUBLISHED, published.status)
         coVerify(exactly = 1) { eventRepository.findById(eventId) }
@@ -130,11 +130,10 @@ class EventServiceTest {
         coEvery { eventRepository.findById(eventId) } returns activeEvent
         coEvery { eventRepository.save(any()) } returns cancelledEvent
 
-        val cancelled = eventService.cancelEvent(eventId)
+        val cancelled = eventService.cancelEvent(eventId, "org-123")
 
         assertEquals(EventStatus.CANCELLED, cancelled.status)
         coVerify(exactly = 1) { eventRepository.findById(eventId) }
         coVerify(exactly = 1) { eventRepository.save(match { it.status == EventStatus.CANCELLED }) }
     }
 }
-

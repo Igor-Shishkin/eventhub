@@ -2,14 +2,8 @@ package com.eventhub.eventservice.infrastructure.rest.dto
 
 import com.eventhub.eventservice.domain.model.EventRegistration
 import com.eventhub.eventservice.domain.model.RegistrationStatus
-import jakarta.validation.constraints.NotBlank
 import java.time.Instant
 import java.util.UUID
-
-data class RegisterAttendeeRequest(
-    @field:NotBlank(message = "User ID must not be blank")
-    val userId: String? = null
-)
 
 data class EventRegistrationResponse(
     val id: UUID,
@@ -28,4 +22,3 @@ data class EventRegistrationResponse(
         )
     }
 }
-
