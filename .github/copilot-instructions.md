@@ -23,6 +23,7 @@ Before making significant changes, read:
 - Prefer simple solutions over unnecessary abstractions.
 - Add tests for new business logic.
 - Update documentation when architectural decisions change.
+- After each meaningful code change or development step, update `docs/PROJECT_CONTEXT.md` with the implemented behavior, validation status, and next steps; update `README.md` or other relevant documentation when setup or user-facing behavior changes.
 
 ## Development approach
 - Work incrementally.

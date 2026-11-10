@@ -119,6 +119,19 @@ This starts only the infrastructure containers (PostgreSQL). On the initial star
 > docker compose down -v && docker compose up -d
 > ```
 
+## Local demo data
+
+A fresh PostgreSQL volume is initialized with four demo events: two published events, one draft event, and one cancelled event. The dataset also includes eight fictional attendees: `anna.nowak`, `piotr.kowalski`, `maria.zielinska`, `pawel.lewandowski`, `karolina.wojcik`, `mateusz.kaczmarek`, `olga.mazur`, and `jan.wojciechowski`.
+
+The initialization scripts run only when PostgreSQL creates the database volume for the first time. To recreate the demo data, reset the local volume and start the infrastructure again:
+
+```bash
+docker compose down -v
+docker compose up -d
+```
+
+After that, start the Event Service and frontend as described below, then open the events list and select any demo event to try publishing, cancelling, registering, or cancelling a registration.
+
 ### 2. Run Event Service Locally
 ```bash
 ./event-service/gradlew -p event-service bootRun
