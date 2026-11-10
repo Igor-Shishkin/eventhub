@@ -326,10 +326,16 @@ eventhub/
   - Typed API service (`EventService`) integrated with reactive REST endpoints.
   - Local development proxy (`proxy.conf.json`) forwarding `/api` calls to `http://localhost:8081` without requiring CORS on backend services.
   - Karma/Jasmine unit tests with headless Chrome execution.
+
 - CI/CD:
   - GitHub Actions validates pull requests and pushes to `main` with backend tests, frontend build/tests, and Docker Compose configuration validation.
   - Version tags matching `v*` build and publish the Event Service image to GitHub Container Registry.
   - Frontend dependency lockfile resolves packages from the public npm registry so GitHub-hosted runners can install dependencies without private network access.
+
+- Local development data:
+  - PostgreSQL initialization includes deterministic demo events in `PUBLISHED`, `DRAFT`, and `CANCELLED` states, plus eight registrations with fictional, human-readable usernames.
+  - The demo dataset is created only for a fresh PostgreSQL volume; use `docker compose down -v && docker compose up -d` to recreate it.
+
 - Next steps:
   - Integration with RabbitMQ (publishing business events like `EventPublished`, `EventRegistered`, `EventRegistrationCancelled`).
   - Volunteer Service implementation.
