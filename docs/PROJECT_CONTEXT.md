@@ -326,6 +326,9 @@ eventhub/
   - Typed API service (`EventService`) integrated with reactive REST endpoints.
   - Local development proxy (`proxy.conf.json`) forwarding `/api` calls to `http://localhost:8081` without requiring CORS on backend services.
   - Karma/Jasmine unit tests with headless Chrome execution.
+- Local development data:
+  - PostgreSQL initialization includes deterministic demo events in `PUBLISHED`, `DRAFT`, and `CANCELLED` states, plus sample registrations.
+  - The demo dataset is created only for a fresh PostgreSQL volume; use `docker compose down -v && docker compose up -d` to recreate it.
 - Next steps:
   - Integration with RabbitMQ (publishing business events like `EventPublished`, `EventRegistered`, `EventRegistrationCancelled`).
   - Volunteer Service implementation.
