@@ -13,13 +13,11 @@ data class CreateEventRequest(
     val title: String,
     val description: String? = null,
     val location: String? = null,
-    @field:NotBlank(message = "Organizer ID cannot be blank")
-    val organizerId: String,
     @field:NotNull(message = "Start time cannot be null")
     val startTime: Instant?,
     val endTime: Instant? = null
 ) {
-    fun toCommand(): CreateEventCommand = CreateEventCommand(
+    fun toCommand(organizerId: String): CreateEventCommand = CreateEventCommand(
         title = title,
         description = description,
         location = location,
@@ -56,4 +54,3 @@ data class EventResponse(
         )
     }
 }
-

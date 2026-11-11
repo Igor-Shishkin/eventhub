@@ -1,22 +1,19 @@
 import { Component, Input, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { EventService } from '../../services/event.service';
 import { EventRegistration, EventStatus } from '../../models/event.model';
+import { KeycloakService } from '../../auth/keycloak.service';
 
 @Component({
   selector: 'app-event-registrations',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     ButtonModule,
-    InputTextModule,
     MessageModule,
     TagModule,
     ProgressSpinnerModule
@@ -29,17 +26,23 @@ export class EventRegistrationsComponent implements OnInit {
   @Input({ required: true }) eventStatus!: EventStatus;
 
   private readonly eventService = inject(EventService);
+  readonly keycloak = inject(KeycloakService);
 
   readonly registrations = signal<EventRegistration[]>([]);
+  readonly myRegistration = signal<EventRegistration | null>(null);
   readonly loading = signal<boolean>(false);
   readonly actionInProgress = signal<boolean>(false);
-  readonly userId = signal<string>('user-attendee-1');
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
 
   ngOnInit(): void {
     if (this.eventId) {
-      this.loadRegistrations();
+      if (this.keycloak.isOrganizer()) {
+        this.loadRegistrations();
+      }
+      if (this.keycloak.authenticated()) {
+        this.loadMyRegistration();
+      }
     }
   }
 
@@ -57,22 +60,32 @@ export class EventRegistrationsComponent implements OnInit {
     });
   }
 
-  onRegister(): void {
-    const user = this.userId().trim();
-    if (!user) {
-      this.errorMessage.set('Please provide a valid User ID');
-      return;
-    }
+  loadMyRegistration(): void {
+    this.eventService.getMyRegistration(this.eventId).subscribe({
+      next: registration => this.myRegistration.set(registration),
+      error: err => {
+        if (err.status === 404) {
+          this.myRegistration.set(null);
+          return;
+        }
+        this.errorMessage.set('Failed to load your registration.');
+      }
+    });
+  }
 
+  onRegister(): void {
     this.actionInProgress.set(true);
     this.errorMessage.set(null);
     this.successMessage.set(null);
 
-    this.eventService.registerForEvent(this.eventId, { userId: user }).subscribe({
-      next: () => {
-        this.successMessage.set(`Successfully registered '${user}' for this event!`);
+    this.eventService.registerForEvent(this.eventId).subscribe({
+      next: registration => {
+        this.myRegistration.set(registration);
+        this.successMessage.set('You are registered for this event.');
         this.actionInProgress.set(false);
-        this.loadRegistrations();
+        if (this.keycloak.isOrganizer()) {
+          this.loadRegistrations();
+        }
       },
       error: (err) => {
         this.errorMessage.set(err.error?.detail || 'Failed to register for this event.');
@@ -81,8 +94,8 @@ export class EventRegistrationsComponent implements OnInit {
     });
   }
 
-  onCancelRegistration(user: string): void {
-    if (!confirm(`Cancel registration for '${user}'?`)) {
+  onCancelRegistration(): void {
+    if (!confirm('Cancel your registration for this event?')) {
       return;
     }
 
@@ -90,11 +103,14 @@ export class EventRegistrationsComponent implements OnInit {
     this.errorMessage.set(null);
     this.successMessage.set(null);
 
-    this.eventService.cancelRegistration(this.eventId, user).subscribe({
-      next: () => {
-        this.successMessage.set(`Registration for '${user}' cancelled.`);
+    this.eventService.cancelMyRegistration(this.eventId).subscribe({
+      next: registration => {
+        this.myRegistration.set(registration);
+        this.successMessage.set('Your registration was cancelled.');
         this.actionInProgress.set(false);
-        this.loadRegistrations();
+        if (this.keycloak.isOrganizer()) {
+          this.loadRegistrations();
+        }
       },
       error: (err) => {
         this.errorMessage.set(err.error?.detail || 'Failed to cancel registration.');
@@ -103,6 +119,5 @@ export class EventRegistrationsComponent implements OnInit {
     });
   }
 }
-
 
 

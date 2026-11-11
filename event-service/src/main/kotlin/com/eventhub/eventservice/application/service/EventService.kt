@@ -3,6 +3,7 @@ package com.eventhub.eventservice.application.service
 import com.eventhub.eventservice.application.port.`in`.CreateEventCommand
 import com.eventhub.eventservice.application.port.`in`.EventUseCase
 import com.eventhub.eventservice.domain.exception.EventNotFoundException
+import com.eventhub.eventservice.domain.exception.UnauthorizedEventOperationException
 import com.eventhub.eventservice.domain.model.Event
 import com.eventhub.eventservice.domain.port.EventRepositoryPort
 import kotlinx.coroutines.flow.Flow
@@ -34,16 +35,23 @@ class EventService(
         return eventRepository.findAll()
     }
 
-    override suspend fun publishEvent(id: UUID): Event {
+    override suspend fun publishEvent(id: UUID, organizerId: String): Event {
         val event = getEventById(id)
+        checkOrganizerAccess(event, organizerId)
         val publishedEvent = event.publish()
         return eventRepository.save(publishedEvent)
     }
 
-    override suspend fun cancelEvent(id: UUID): Event {
+    override suspend fun cancelEvent(id: UUID, organizerId: String): Event {
         val event = getEventById(id)
+        checkOrganizerAccess(event, organizerId)
         val cancelledEvent = event.cancel()
         return eventRepository.save(cancelledEvent)
     }
-}
 
+    private fun checkOrganizerAccess(event: Event, organizerId: String) {
+        if (event.organizerId != organizerId) {
+            throw UnauthorizedEventOperationException(requireNotNull(event.id), organizerId)
+        }
+    }
+}

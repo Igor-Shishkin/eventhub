@@ -5,15 +5,15 @@ import com.eventhub.eventservice.application.port.`in`.EventRegistrationUseCase
 import com.eventhub.eventservice.application.port.`in`.RegisterAttendeeCommand
 import com.eventhub.eventservice.domain.exception.RegistrationNotFoundException
 import com.eventhub.eventservice.infrastructure.rest.dto.EventRegistrationResponse
-import com.eventhub.eventservice.infrastructure.rest.dto.RegisterAttendeeRequest
-import jakarta.validation.Valid
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.jwt.Jwt
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
@@ -29,12 +29,12 @@ class EventRegistrationController(
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun registerAttendee(
         @PathVariable eventId: UUID,
-        @Valid @RequestBody request: RegisterAttendeeRequest
+        @AuthenticationPrincipal jwt: Jwt
     ): EventRegistrationResponse {
         val registration = registrationUseCase.registerAttendee(
             RegisterAttendeeCommand(
                 eventId = eventId,
-                userId = request.userId!!
+                userId = requireNotNull(jwt.subject)
             )
         )
         return EventRegistrationResponse.from(registration)
@@ -46,28 +46,28 @@ class EventRegistrationController(
             .map { EventRegistrationResponse.from(it) }
     }
 
-    @GetMapping("/{userId}")
-    suspend fun getRegistration(
+    @GetMapping("/me")
+    suspend fun getMyRegistration(
         @PathVariable eventId: UUID,
-        @PathVariable userId: String
+        @AuthenticationPrincipal jwt: Jwt
     ): EventRegistrationResponse {
+        val userId = requireNotNull(jwt.subject)
         val registration = registrationUseCase.getRegistration(eventId, userId)
             ?: throw RegistrationNotFoundException(eventId, userId)
         return EventRegistrationResponse.from(registration)
     }
 
-    @PostMapping("/{userId}/cancel")
-    suspend fun cancelRegistration(
+    @DeleteMapping("/me")
+    suspend fun cancelMyRegistration(
         @PathVariable eventId: UUID,
-        @PathVariable userId: String
+        @AuthenticationPrincipal jwt: Jwt
     ): EventRegistrationResponse {
         val cancelled = registrationUseCase.cancelRegistration(
             CancelRegistrationCommand(
                 eventId = eventId,
-                userId = userId
+                userId = requireNotNull(jwt.subject)
             )
         )
         return EventRegistrationResponse.from(cancelled)
     }
 }
-

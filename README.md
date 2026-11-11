@@ -44,6 +44,7 @@ The application is designed as a microservices-based system using event-driven c
 ### Planned Services
 
 - **Event Service** – manages events, schedules, and attendee registrations.
+- **User Profile Service** – manages application-level user profiles and avatars (planned).
 - **Volunteer Service** – manages volunteer positions, availability, shifts, and assignments.
 - **Notification Service** – handles email notifications and reminders.
 - **Analytics Service** – consumes user activity events and generates statistics and insights.
@@ -107,7 +108,9 @@ eventhub/
 ```bash
 docker compose up -d
 ```
-This starts only the infrastructure containers (PostgreSQL). On the initial startup, PostgreSQL automatically executes the initialization scripts located in `infrastructure/postgres/init/` to create the required tables and indexes.
+This starts the infrastructure containers, including PostgreSQL and Keycloak. On the initial startup, PostgreSQL automatically executes the initialization scripts located in `infrastructure/postgres/init/` to create the required tables and indexes. Keycloak imports the local `eventhub` realm from `infrastructure/keycloak/eventhub-realm.json`.
+
+For local authentication details and demo users, see [Keycloak setup](docs/security/KEYCLOAK.md).
 
 > **Tip:** If you want to run all services inside Docker instead of running them locally:
 > ```bash
@@ -171,7 +174,7 @@ Planned development stages:
 
 1. Project setup and frontend development.
 2. Core backend microservices and REST APIs.
-3. Authentication and authorization with Keycloak.
+3. Authentication and authorization with Keycloak. **In progress.**
 4. Asynchronous business communication using RabbitMQ.
 5. Event streaming and analytics using Apache Kafka.
 6. Docker containerization and Kubernetes deployment.
@@ -183,6 +186,7 @@ Features and infrastructure components described as planned are not necessarily 
 ## Documentation
 
 - [Project Context](docs/PROJECT_CONTEXT.md) – overall project goals, architecture, features, and technical decisions.
+- [User Profile Service](docs/architecture/USER_PROFILE_SERVICE.md) – planned profile, avatar, and ownership boundaries.
 - [Copilot Instructions](.github/copilot-instructions.md) – guidelines for AI-assisted development.
 
 ## License

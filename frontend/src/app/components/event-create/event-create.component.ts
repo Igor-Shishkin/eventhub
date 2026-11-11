@@ -34,7 +34,6 @@ export class EventCreateComponent {
 
   readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(255)]],
-    organizerId: ['org-1', [Validators.required, Validators.maxLength(255)]],
     location: [''],
     startTime: ['', [Validators.required]],
     endTime: [''],
@@ -61,7 +60,6 @@ export class EventCreateComponent {
 
     const payload: CreateEventRequest = {
       title: val.title.trim(),
-      organizerId: val.organizerId.trim(),
       location: val.location?.trim() || null,
       description: val.description?.trim() || null,
       startTime: startIso,

@@ -27,15 +27,10 @@ describe('EventRegistrationsComponent', () => {
     httpTesting.verify();
   });
 
-  it('should create and load registrations on init', () => {
+  it('should create without loading private registrations for an anonymous user', () => {
     component.ngOnInit();
-
-    const req = httpTesting.expectOne('/api/v1/events/evt-123/registrations');
-    expect(req.request.method).toBe('GET');
-    req.flush([]);
 
     expect(component).toBeTruthy();
     expect(component.registrations()).toEqual([]);
   });
 });
-

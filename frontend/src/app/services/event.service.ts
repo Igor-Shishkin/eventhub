@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CreateEventRequest, EventItem, EventRegistration, RegisterAttendeeRequest } from '../models/event.model';
+import { CreateEventRequest, EventItem, EventRegistration } from '../models/event.model';
 
 @Injectable({
   providedIn: 'root'
@@ -34,17 +34,16 @@ export class EventService {
     return this.http.get<EventRegistration[]>(`${this.baseUrl}/${eventId}/registrations`);
   }
 
-  getRegistration(eventId: string, userId: string): Observable<EventRegistration> {
-    return this.http.get<EventRegistration>(`${this.baseUrl}/${eventId}/registrations/${userId}`);
+  getMyRegistration(eventId: string): Observable<EventRegistration> {
+    return this.http.get<EventRegistration>(`${this.baseUrl}/${eventId}/registrations/me`);
   }
 
-  registerForEvent(eventId: string, request: RegisterAttendeeRequest): Observable<EventRegistration> {
-    return this.http.post<EventRegistration>(`${this.baseUrl}/${eventId}/registrations`, request);
+  registerForEvent(eventId: string): Observable<EventRegistration> {
+    return this.http.post<EventRegistration>(`${this.baseUrl}/${eventId}/registrations`, {});
   }
 
-  cancelRegistration(eventId: string, userId: string): Observable<EventRegistration> {
-    return this.http.post<EventRegistration>(`${this.baseUrl}/${eventId}/registrations/${userId}/cancel`, {});
+  cancelMyRegistration(eventId: string): Observable<EventRegistration> {
+    return this.http.delete<EventRegistration>(`${this.baseUrl}/${eventId}/registrations/me`);
   }
 }
-
 

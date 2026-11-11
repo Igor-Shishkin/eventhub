@@ -5,6 +5,7 @@ import { EventService } from '../../services/event.service';
 import { EventItem } from '../../models/event.model';
 import { EventRegistrationsComponent } from '../event-registrations/event-registrations.component';
 import { EventInfoCardComponent } from '../event-info-card/event-info-card.component';
+import { KeycloakService } from '../../auth/keycloak.service';
 
 @Component({
   selector: 'app-event-detail',
@@ -17,6 +18,7 @@ export class EventDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly eventService = inject(EventService);
 
+  readonly keycloak = inject(KeycloakService);
   readonly event = signal<EventItem | null>(null);
   readonly loading = signal<boolean>(true);
   readonly errorMessage = signal<string | null>(null);
@@ -95,7 +97,6 @@ export class EventDetailComponent implements OnInit {
     });
   }
 }
-
 
 
 

@@ -128,6 +128,13 @@ The system follows a microservices architecture.
 - Handles attendee registrations.
 - Exposes event-related REST APIs.
 
+**User Profile Service**
+- Owns application-level user profiles.
+- Stores display data, preferences, consents, and avatar metadata.
+- Uses the immutable Keycloak `JWT.sub` claim as the user reference.
+- Does not store passwords, refresh tokens, or access tokens.
+- Is planned as a follow-up service after the Keycloak integration.
+
 **Volunteer Service**
 - Manages volunteer positions and shifts.
 - Stores volunteer availability.
@@ -221,6 +228,26 @@ The API Gateway and backend services validate tokens and enforce authorization r
 
 Business services should not depend on Keycloak being queried on every request. JWT signature validation using Keycloak's public keys is preferred.
 
+The current local implementation uses the `eventhub` realm and the OpenID Connect
+Authorization Code flow with PKCE for the Angular frontend. The event service validates
+JWT access tokens as an OAuth2 Resource Server, maps Keycloak realm roles to Spring Security
+roles, and derives the current user ID from the JWT `sub` claim. Organizer ownership is
+checked in the event application service rather than trusted from the request body.
+
+The current local Keycloak setup is intended for development only and does not yet use a
+dedicated persistent database. A planned infrastructure step is to run Keycloak with its
+own PostgreSQL database, separate from all business-service databases. Keycloak database
+credentials, backups, persistent storage, and deployment configuration must be managed as
+infrastructure concerns. Application services must not access this database directly.
+
+Keycloak remains responsible for identity infrastructure, while the planned User Profile
+Service will own application-level profile data. Profile data will be addressed by the
+opaque Keycloak subject ID and stored in a separate database. Business services must not
+depend on a synchronous profile lookup for their core write workflows.
+
+Vault is intentionally separate from authentication. It is planned for storing application
+secrets such as database and broker credentials.
+
 ## 8. Frontend
 
 The frontend is built with Angular and TypeScript.
@@ -277,6 +304,7 @@ eventhub/
 
 ### Stage 2 – Core Backend
 - Implement Event Service.
+- Implement the initial User Profile Service after authentication is verified.
 - Implement Volunteer Service.
 - Integrate PostgreSQL.
 - Connect frontend to backend APIs.
@@ -320,6 +348,8 @@ eventhub/
   - REST APIs with Spring WebFlux (`/api/v1/events`, `/api/v1/events/{id}/registrations`), RFC 7807 error handling, and bean validation.
   - Production & Kubernetes readiness configuration (graceful shutdown, liveness/readiness probes, connection pool).
   - Unit, domain, service, and WebTestClient test suite implemented using JUnit 5, Kotlin Coroutines Test, and MockK.
+  - Keycloak JWT resource-server integration with `USER`, `ORGANIZER`, and `ADMIN` roles.
+  - Authenticated attendee registration endpoints derive the user ID from the JWT.
 - `frontend`:
   - Angular 18 standalone components styled with PrimeNG 18 and PrimeIcons (Aura preset).
   - Decomposed components: navbar, event list, event creation, event detail, attendee registrations (`EventRegistrationsComponent`), and event info card (`EventInfoCardComponent`).
@@ -337,7 +367,9 @@ eventhub/
   - The demo dataset is created only for a fresh PostgreSQL volume; use `docker compose down -v && docker compose up -d` to recreate it.
 
 - Next steps:
-  - Integration with RabbitMQ (publishing business events like `EventPublished`, `EventRegistered`, `EventRegistrationCancelled`).
+  - Verify the Keycloak authentication flow and local roles.
+  - Implement the User Profile Service as a separate vertical slice.
+  - Add an outbox and integrate RabbitMQ (publishing business events like `EventPublished`, `EventRegistered`, `EventRegistrationCancelled`).
   - Volunteer Service implementation.
 
 This document should be updated when important architectural or functional decisions change.

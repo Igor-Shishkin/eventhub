@@ -63,7 +63,7 @@ describe('EventService', () => {
       registeredAt: '2026-06-01T10:00:00Z'
     };
 
-    service.registerForEvent('evt-1', { userId: 'user-1' }).subscribe(reg => {
+    service.registerForEvent('evt-1').subscribe(reg => {
       expect(reg.id).toBe('reg-1');
       expect(reg.userId).toBe('user-1');
       expect(reg.status).toBe('REGISTERED');
@@ -71,11 +71,29 @@ describe('EventService', () => {
 
     const req = httpTesting.expectOne('/api/v1/events/evt-1/registrations');
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ userId: 'user-1' });
+    expect(req.request.body).toEqual({});
     req.flush(mockRegistration);
   });
 
-  it('should cancel registration', () => {
+  it('should get the current user registration', () => {
+    const mockRegistration: EventRegistration = {
+      id: 'reg-1',
+      eventId: 'evt-1',
+      userId: 'user-1',
+      status: 'REGISTERED',
+      registeredAt: '2026-06-01T10:00:00Z'
+    };
+
+    service.getMyRegistration('evt-1').subscribe(reg => {
+      expect(reg.id).toBe('reg-1');
+    });
+
+    const req = httpTesting.expectOne('/api/v1/events/evt-1/registrations/me');
+    expect(req.request.method).toBe('GET');
+    req.flush(mockRegistration);
+  });
+
+  it('should cancel the current user registration', () => {
     const mockRegistration: EventRegistration = {
       id: 'reg-1',
       eventId: 'evt-1',
@@ -84,14 +102,13 @@ describe('EventService', () => {
       registeredAt: '2026-06-01T10:00:00Z'
     };
 
-    service.cancelRegistration('evt-1', 'user-1').subscribe(reg => {
+    service.cancelMyRegistration('evt-1').subscribe(reg => {
       expect(reg.status).toBe('CANCELLED');
     });
 
-    const req = httpTesting.expectOne('/api/v1/events/evt-1/registrations/user-1/cancel');
-    expect(req.request.method).toBe('POST');
+    const req = httpTesting.expectOne('/api/v1/events/evt-1/registrations/me');
+    expect(req.request.method).toBe('DELETE');
     req.flush(mockRegistration);
   });
 });
-
 
