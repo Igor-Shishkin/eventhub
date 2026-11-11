@@ -128,6 +128,13 @@ The system follows a microservices architecture.
 - Handles attendee registrations.
 - Exposes event-related REST APIs.
 
+**User Profile Service**
+- Owns application-level user profiles.
+- Stores display data, preferences, consents, and avatar metadata.
+- Uses the immutable Keycloak `JWT.sub` claim as the user reference.
+- Does not store passwords, refresh tokens, or access tokens.
+- Is planned as a follow-up service after the Keycloak integration.
+
 **Volunteer Service**
 - Manages volunteer positions and shifts.
 - Stores volunteer availability.
@@ -227,6 +234,11 @@ JWT access tokens as an OAuth2 Resource Server, maps Keycloak realm roles to Spr
 roles, and derives the current user ID from the JWT `sub` claim. Organizer ownership is
 checked in the event application service rather than trusted from the request body.
 
+Keycloak remains responsible for identity infrastructure, while the planned User Profile
+Service will own application-level profile data. Profile data will be addressed by the
+opaque Keycloak subject ID and stored in a separate database. Business services must not
+depend on a synchronous profile lookup for their core write workflows.
+
 Vault is intentionally separate from authentication. It is planned for storing application
 secrets such as database and broker credentials.
 
@@ -286,6 +298,7 @@ eventhub/
 
 ### Stage 2 – Core Backend
 - Implement Event Service.
+- Implement the initial User Profile Service after authentication is verified.
 - Implement Volunteer Service.
 - Integrate PostgreSQL.
 - Connect frontend to backend APIs.
@@ -338,6 +351,8 @@ eventhub/
   - Local development proxy (`proxy.conf.json`) forwarding `/api` calls to `http://localhost:8081` without requiring CORS on backend services.
   - Karma/Jasmine unit tests with headless Chrome execution.
 - Next steps:
+  - Verify the Keycloak authentication flow and local roles.
+  - Implement the User Profile Service as a separate vertical slice.
   - Add an outbox and integrate RabbitMQ (publishing business events like `EventPublished`, `EventRegistered`, `EventRegistrationCancelled`).
   - Volunteer Service implementation.
 

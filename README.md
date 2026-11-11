@@ -44,6 +44,7 @@ The application is designed as a microservices-based system using event-driven c
 ### Planned Services
 
 - **Event Service** – manages events, schedules, and attendee registrations.
+- **User Profile Service** – manages application-level user profiles and avatars (planned).
 - **Volunteer Service** – manages volunteer positions, availability, shifts, and assignments.
 - **Notification Service** – handles email notifications and reminders.
 - **Analytics Service** – consumes user activity events and generates statistics and insights.
@@ -157,6 +158,7 @@ Features and infrastructure components described as planned are not necessarily 
 ## Documentation
 
 - [Project Context](docs/PROJECT_CONTEXT.md) – overall project goals, architecture, features, and technical decisions.
+- [User Profile Service](docs/architecture/USER_PROFILE_SERVICE.md) – planned profile, avatar, and ownership boundaries.
 - [Copilot Instructions](.github/copilot-instructions.md) – guidelines for AI-assisted development.
 
 ## License
