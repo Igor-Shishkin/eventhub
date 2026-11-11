@@ -25,6 +25,9 @@ Demo users:
 |---|---|---|---|
 | `ada.lovelace` | `ada` | `USER`, `ORGANIZER` | Create, publish, and cancel events |
 | `linus.torvalds` | `linus` | `USER`, `ORGANIZER` | Manage the second demo organizer's events |
+| `guido.vanrossum` | `guido` | `USER`, `ORGANIZER` | Create and manage demo events |
+| `grace.hopper` | `grace` | `USER`, `ORGANIZER` | Create and manage demo events |
+| `margaret.hamilton` | `margaret` | `USER`, `ORGANIZER` | Create and manage demo events |
 | `user` | `user` | `USER` | Register and cancel a registration |
 | `anna.nowak` | `anna` | `USER` | Demo attendee |
 | `piotr.kowalski` | `piotr` | `USER` | Demo attendee |

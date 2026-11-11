@@ -355,7 +355,7 @@ eventhub/
   - Keycloak JWT resource-server integration with `USER`, `ORGANIZER`, and `ADMIN` roles.
   - Authenticated attendee registration endpoints derive the user ID from the JWT.
   - Local Keycloak runs against a dedicated PostgreSQL database with a persistent
-    Docker volume and eight seeded presentation users.
+    Docker volume and eleven seeded presentation users, including five organizers.
 - `frontend`:
   - Angular 18 standalone components styled with PrimeNG 18 and PrimeIcons (Aura preset).
   - Decomposed components: navbar, event list, event creation, event detail, attendee registrations (`EventRegistrationsComponent`), and event info card (`EventInfoCardComponent`).
@@ -370,7 +370,7 @@ eventhub/
 
 - Local development data:
   - Event Service PostgreSQL initialization includes deterministic demo events in `PUBLISHED`, `DRAFT`, and `CANCELLED` states, plus eight registrations linked to opaque Keycloak subject IDs.
-  - Keycloak uses a separate PostgreSQL database and imports eight fictional demo users from `infrastructure/keycloak/eventhub-realm.json`.
+  - Keycloak uses a separate PostgreSQL database and imports eleven fictional demo users from `infrastructure/keycloak/eventhub-realm.json`.
   - The demo dataset and realm seed are created only for fresh volumes; use `docker compose down -v && docker compose up -d` to recreate them.
 
 - Next steps:

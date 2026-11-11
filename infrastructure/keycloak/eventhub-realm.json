@@ -72,6 +72,54 @@
       ]
     },
     {
+      "id": "00000000-0000-4000-8000-000000000009",
+      "username": "guido.vanrossum",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "guido",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER",
+        "ORGANIZER"
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000010",
+      "username": "grace.hopper",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "grace",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER",
+        "ORGANIZER"
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000011",
+      "username": "margaret.hamilton",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "margaret",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER",
+        "ORGANIZER"
+      ]
+    },
+    {
       "id": "00000000-0000-4000-8000-000000000003",
       "username": "user",
       "enabled": true,
