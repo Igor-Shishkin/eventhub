@@ -333,7 +333,7 @@ eventhub/
 
 ## 12. Current Project Status
 
-**Status: Stage 1 & Stage 2 in progress – Event Service & Frontend UI implemented.**
+**Status: Stage 1 & Stage 2 in progress – Event Service & Frontend UI implemented; initial CI/CD automation is in place.**
 
 - `event-service`:
   - Core domain models (`Event`, `EventRegistration`) with state transition logic.
@@ -350,6 +350,16 @@ eventhub/
   - Typed API service (`EventService`) integrated with reactive REST endpoints.
   - Local development proxy (`proxy.conf.json`) forwarding `/api` calls to `http://localhost:8081` without requiring CORS on backend services.
   - Karma/Jasmine unit tests with headless Chrome execution.
+
+- CI/CD:
+  - GitHub Actions validates pull requests and pushes to `main` with backend tests, frontend build/tests, and Docker Compose configuration validation.
+  - Version tags matching `v*` build and publish the Event Service image to GitHub Container Registry.
+  - Frontend dependency lockfile resolves packages from the public npm registry so GitHub-hosted runners can install dependencies without private network access.
+
+- Local development data:
+  - PostgreSQL initialization includes deterministic demo events in `PUBLISHED`, `DRAFT`, and `CANCELLED` states, plus eight registrations with fictional, human-readable usernames.
+  - The demo dataset is created only for a fresh PostgreSQL volume; use `docker compose down -v && docker compose up -d` to recreate it.
+
 - Next steps:
   - Verify the Keycloak authentication flow and local roles.
   - Implement the User Profile Service as a separate vertical slice.

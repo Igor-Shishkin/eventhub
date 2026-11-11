@@ -122,11 +122,39 @@ For local authentication details and demo users, see [Keycloak setup](docs/secur
 > docker compose down -v && docker compose up -d
 > ```
 
+## Local demo data
+
+A fresh PostgreSQL volume is initialized with four demo events: two published events, one draft event, and one cancelled event. The dataset also includes eight fictional attendees: `anna.nowak`, `piotr.kowalski`, `maria.zielinska`, `pawel.lewandowski`, `karolina.wojcik`, `mateusz.kaczmarek`, `olga.mazur`, and `jan.wojciechowski`.
+
+The initialization scripts run only when PostgreSQL creates the database volume for the first time. To recreate the demo data, reset the local volume and start the infrastructure again:
+
+```bash
+docker compose down -v
+docker compose up -d
+```
+
+After that, start the Event Service and frontend as described below, then open the events list and select any demo event to try publishing, cancelling, registering, or cancelling a registration.
+
 ### 2. Run Event Service Locally
 ```bash
 ./event-service/gradlew -p event-service bootRun
 ```
 The service connects to PostgreSQL on `localhost:5432` by default using credentials specified in `application.yaml` and `docker-compose.yml`.
+
+## CI/CD
+
+GitHub Actions validates every pull request and push to `main`:
+
+- backend tests run with Java 25 and the Gradle wrapper;
+- frontend dependencies are installed with `npm ci`, then Angular production build and headless browser tests run with Node.js 20;
+- Docker Compose configuration is validated with `docker compose config --quiet`.
+
+A version tag such as `v1.0.0` starts the release workflow. It builds `event-service/Dockerfile` and publishes the image to GitHub Container Registry as:
+
+```text
+ghcr.io/igor-shishkin/eventhub-event-service:v1.0.0
+ghcr.io/igor-shishkin/eventhub-event-service:latest
+```
 
 ### 3. Run Frontend Locally
 ```bash
