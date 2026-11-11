@@ -22,24 +22,33 @@ vertical slices over broad rewrites.
 
 ## Keycloak and persistence
 
-The current local Keycloak setup is development-only and uses `start-dev`.
-It does not yet have a dedicated PostgreSQL database. A planned infrastructure
-step is to add a separate PostgreSQL database owned by Keycloak, with persistent
-storage, backups, and secrets supplied outside the repository.
+The local Keycloak setup is development-only and uses `start-dev` with a
+dedicated `postgres-keycloak` PostgreSQL service and `keycloak_pgdata` volume.
+The Event Service database and Keycloak database are separate ownership
+boundaries. Keycloak imports the local realm and demo users from
+`infrastructure/keycloak/eventhub-realm.json` into its database on first
+startup.
 
-Do not add passwords or production secrets to source control. The local demo
-credentials documented in `docs/security/KEYCLOAK.md` are for development only.
+Do not add production passwords or secrets to source control. The local
+development defaults and demo credentials documented in
+`docs/security/KEYCLOAK.md` are intentionally for local use only. Override
+`KEYCLOAK_DB_PASSWORD` and `KEYCLOAK_ADMIN_PASSWORD` through the environment
+when needed.
 
 ## Local development
 
 Useful commands:
 
 ```bash
-docker compose up -d postgres-event keycloak
+docker compose up -d postgres-event postgres-keycloak keycloak
 ./event-service/gradlew -p event-service test
 cd frontend && npm test -- --watch=false
 cd frontend && npm run build
 ```
+
+The Keycloak realm seed is applied only when the Keycloak database is empty.
+After changing demo users or roles in the realm JSON, reset both local
+databases with `docker compose down -v` before starting the stack again.
 
 Read the relevant documentation before changing authentication or service
 boundaries:
@@ -61,4 +70,3 @@ boundaries:
   can be derived from the JWT.
 - Before proposing a PR, run the relevant backend/frontend tests and
   `git diff --check`.
-

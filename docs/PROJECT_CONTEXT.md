@@ -234,11 +234,13 @@ JWT access tokens as an OAuth2 Resource Server, maps Keycloak realm roles to Spr
 roles, and derives the current user ID from the JWT `sub` claim. Organizer ownership is
 checked in the event application service rather than trusted from the request body.
 
-The current local Keycloak setup is intended for development only and does not yet use a
-dedicated persistent database. A planned infrastructure step is to run Keycloak with its
-own PostgreSQL database, separate from all business-service databases. Keycloak database
-credentials, backups, persistent storage, and deployment configuration must be managed as
-infrastructure concerns. Application services must not access this database directly.
+The current local Keycloak setup is intended for development only and uses its own
+dedicated PostgreSQL database and persistent Docker volume, separate from all
+business-service databases. Local realm users are imported from the repository
+seed into that database on first startup. Keycloak database credentials,
+backups, persistent storage, and deployment configuration must be managed as
+infrastructure concerns. Application services must not access this database
+directly.
 
 Keycloak remains responsible for identity infrastructure, while the planned User Profile
 Service will own application-level profile data. Profile data will be addressed by the
@@ -350,6 +352,8 @@ eventhub/
   - Unit, domain, service, and WebTestClient test suite implemented using JUnit 5, Kotlin Coroutines Test, and MockK.
   - Keycloak JWT resource-server integration with `USER`, `ORGANIZER`, and `ADMIN` roles.
   - Authenticated attendee registration endpoints derive the user ID from the JWT.
+  - Local Keycloak runs against a dedicated PostgreSQL database with a persistent
+    Docker volume and eight seeded presentation users.
 - `frontend`:
   - Angular 18 standalone components styled with PrimeNG 18 and PrimeIcons (Aura preset).
   - Decomposed components: navbar, event list, event creation, event detail, attendee registrations (`EventRegistrationsComponent`), and event info card (`EventInfoCardComponent`).
@@ -363,11 +367,11 @@ eventhub/
   - Frontend dependency lockfile resolves packages from the public npm registry so GitHub-hosted runners can install dependencies without private network access.
 
 - Local development data:
-  - PostgreSQL initialization includes deterministic demo events in `PUBLISHED`, `DRAFT`, and `CANCELLED` states, plus eight registrations with fictional, human-readable usernames.
-  - The demo dataset is created only for a fresh PostgreSQL volume; use `docker compose down -v && docker compose up -d` to recreate it.
+  - Event Service PostgreSQL initialization includes deterministic demo events in `PUBLISHED`, `DRAFT`, and `CANCELLED` states, plus eight registrations linked to opaque Keycloak subject IDs.
+  - Keycloak uses a separate PostgreSQL database and imports eight fictional demo users from `infrastructure/keycloak/eventhub-realm.json`.
+  - The demo dataset and realm seed are created only for fresh volumes; use `docker compose down -v && docker compose up -d` to recreate them.
 
 - Next steps:
-  - Verify the Keycloak authentication flow and local roles.
   - Implement the User Profile Service as a separate vertical slice.
   - Add an outbox and integrate RabbitMQ (publishing business events like `EventPublished`, `EventRegistered`, `EventRegistrationCancelled`).
   - Volunteer Service implementation.

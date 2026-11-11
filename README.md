@@ -108,7 +108,13 @@ eventhub/
 ```bash
 docker compose up -d
 ```
-This starts the infrastructure containers, including PostgreSQL and Keycloak. On the initial startup, PostgreSQL automatically executes the initialization scripts located in `infrastructure/postgres/init/` to create the required tables and indexes. Keycloak imports the local `eventhub` realm from `infrastructure/keycloak/eventhub-realm.json`.
+This starts the infrastructure containers, including the Event Service
+PostgreSQL database, the dedicated Keycloak PostgreSQL database, and Keycloak.
+On the initial startup, PostgreSQL automatically executes the Event Service
+initialization scripts located in `infrastructure/postgres/init/` to create the
+required tables and indexes. Keycloak imports the local `eventhub` realm and
+demo users from `infrastructure/keycloak/eventhub-realm.json` into its own
+database.
 
 For local authentication details and demo users, see [Keycloak setup](docs/security/KEYCLOAK.md).
 
@@ -124,16 +130,46 @@ For local authentication details and demo users, see [Keycloak setup](docs/secur
 
 ## Local demo data
 
-A fresh PostgreSQL volume is initialized with four demo events: two published events, one draft event, and one cancelled event. The dataset also includes eight fictional attendees: `anna.nowak`, `piotr.kowalski`, `maria.zielinska`, `pawel.lewandowski`, `karolina.wojcik`, `mateusz.kaczmarek`, `olga.mazur`, and `jan.wojciechowski`.
+A fresh Event Service PostgreSQL volume is initialized with four demo events:
+two published events, one draft event, and one cancelled event. The dataset
+also includes eight registration rows linked to the fixed Keycloak subject IDs
+of the demo users. The login accounts and passwords are documented in
+[Keycloak setup](docs/security/KEYCLOAK.md).
 
-The initialization scripts run only when PostgreSQL creates the database volume for the first time. To recreate the demo data, reset the local volume and start the infrastructure again:
+The Keycloak realm seed is imported into the separate `keycloak_pgdata` volume
+only when the realm does not already exist. To recreate both databases, users,
+and demo events from scratch:
 
 ```bash
 docker compose down -v
 docker compose up -d
 ```
 
-After that, start the Event Service and frontend as described below, then open the events list and select any demo event to try publishing, cancelling, registering, or cancelling a registration.
+The local Keycloak database is exposed on host port `5433`; the Event Service
+database remains on `5432`. Set `KEYCLOAK_DB_PASSWORD` and
+`KEYCLOAK_ADMIN_PASSWORD` in the environment to override the development
+defaults. These accounts and passwords are fictional and must not be reused
+outside local development.
+
+After that, start the Event Service and frontend as described below, then log
+in with one of the demo users. Use `organizer` to create or manage events and
+`user` (or another attendee) to register and cancel a registration.
+
+### Demo Keycloak accounts
+
+| Username | Password | Roles |
+|---|---|---|
+| `organizer` | `organizer` | `USER`, `ORGANIZER` |
+| `organizer2` | `organizer2` | `USER`, `ORGANIZER` |
+| `user` | `user` | `USER` |
+| `anna.nowak` | `anna` | `USER` |
+| `piotr.kowalski` | `piotr` | `USER` |
+| `maria.zielinska` | `maria` | `USER` |
+| `pawel.lewandowski` | `pawel` | `USER` |
+| `karolina.wojcik` | `karolina` | `USER` |
+
+These are local presentation accounts only. Keycloak stores them in the
+dedicated PostgreSQL database after the first realm import.
 
 ### 2. Run Event Service Locally
 ```bash
@@ -174,7 +210,7 @@ Planned development stages:
 
 1. Project setup and frontend development.
 2. Core backend microservices and REST APIs.
-3. Authentication and authorization with Keycloak. **In progress.**
+3. Authentication and authorization with Keycloak, including local PostgreSQL persistence. **Implemented.**
 4. Asynchronous business communication using RabbitMQ.
 5. Event streaming and analytics using Apache Kafka.
 6. Docker containerization and Kubernetes deployment.

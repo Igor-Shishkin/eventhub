@@ -28,15 +28,15 @@ boundary without duplicating credential management.
 
 ## ADR-003: Keycloak will have a dedicated PostgreSQL database
 
-**Status:** Planned
+**Status:** Accepted
 
-The current development setup does not yet persist Keycloak in a dedicated
-database. Before shared or production-like environments, Keycloak must use its
-own PostgreSQL database, separate from business-service databases.
+Keycloak uses its own PostgreSQL database, separate from business-service
+databases. The local Compose setup persists it in the `keycloak_pgdata` volume
+and imports the demo realm and users on first startup.
 
 Application services must never query the Keycloak database directly. Database
 credentials, backups, persistent storage, and deployment secrets are
-infrastructure concerns.
+infrastructure concerns. The committed defaults are for local development only.
 
 ## ADR-004: RabbitMQ and Kafka have different responsibilities
 
@@ -57,4 +57,3 @@ Core operations such as event registration must remain available when the
 Profile Service or avatar storage is temporarily unavailable. If another
 service needs profile display data, use API composition, a local read model, or
 a deliberate snapshot rather than a synchronous dependency in the write path.
-

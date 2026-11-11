@@ -37,17 +37,46 @@ services:
     networks:
       - eventhub-network
 
+  postgres-keycloak:
+    image: postgres:16-alpine
+    container_name: eventhub-postgres-keycloak
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak_password}
+    ports:
+      - "5433:5432"
+    volumes:
+      - keycloak_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - eventhub-network
+
   keycloak:
     image: quay.io/keycloak/keycloak:26.0.6
     container_name: eventhub-keycloak
     command: start-dev --import-realm
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
-      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_DB: postgres
+      KC_DB_URL_HOST: postgres-keycloak
+      KC_DB_URL_PORT: 5432
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:-keycloak_password}
     ports:
       - "8080:8080"
     volumes:
       - ./infrastructure/keycloak:/opt/keycloak/data/import:ro
+    depends_on:
+      postgres-keycloak:
+        condition: service_healthy
     networks:
       - eventhub-network
 
@@ -57,4 +86,4 @@ networks:
 
 volumes:
   event_pgdata:
-
+  keycloak_pgdata:
