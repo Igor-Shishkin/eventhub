@@ -15,13 +15,16 @@ cd frontend && npm start
 Open `http://localhost:4200` and use the **Login** button.
 
 The local realm is imported from `infrastructure/keycloak/eventhub-realm.json`.
+The seed contains authentication data only: a fixed subject ID, username,
+password credential, and realm roles. Display names and other application
+profile data belong to the future User Profile Service.
 
 Demo users:
 
 | Username | Password | Roles | Use for |
 |---|---|---|---|
-| `organizer` | `organizer` | `USER`, `ORGANIZER` | Create, publish, and cancel events |
-| `organizer2` | `organizer2` | `USER`, `ORGANIZER` | Manage the second demo organizer's events |
+| `ada.lovelace` | `ada` | `USER`, `ORGANIZER` | Create, publish, and cancel events |
+| `linus.torvalds` | `linus` | `USER`, `ORGANIZER` | Manage the second demo organizer's events |
 | `user` | `user` | `USER` | Register and cancel a registration |
 | `anna.nowak` | `anna` | `USER` | Demo attendee |
 | `piotr.kowalski` | `piotr` | `USER` | Demo attendee |
@@ -33,6 +36,11 @@ All accounts are fictional local-demo users. Their fixed Keycloak subject IDs
 are used by the Event Service's seeded organizer and registration rows, so
 authorization and "my registration" flows work immediately after a clean
 database start.
+
+The realm JSON is intentional: it is Keycloak's supported realm-import format.
+The Event Service uses SQL because it initializes its own PostgreSQL schema.
+Do not replace the Keycloak import with direct SQL against Keycloak's internal
+tables; those tables are Keycloak-owned and can change between versions.
 
 The Keycloak administration console is available at `http://localhost:8080`.
 The development-only administrator credentials are `admin` / `admin` by default.

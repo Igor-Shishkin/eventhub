@@ -241,6 +241,8 @@ seed into that database on first startup. Keycloak database credentials,
 backups, persistent storage, and deployment configuration must be managed as
 infrastructure concerns. Application services must not access this database
 directly.
+The local realm seed keeps only authentication identity and realm roles;
+display names and preferences remain future User Profile Service data.
 
 Keycloak remains responsible for identity infrastructure, while the planned User Profile
 Service will own application-level profile data. Profile data will be addressed by the

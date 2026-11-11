@@ -152,15 +152,16 @@ defaults. These accounts and passwords are fictional and must not be reused
 outside local development.
 
 After that, start the Event Service and frontend as described below, then log
-in with one of the demo users. Use `organizer` to create or manage events and
-`user` (or another attendee) to register and cancel a registration.
+in with one of the demo users. Use `ada.lovelace` or `linus.torvalds` to create
+or manage events and `user` (or another attendee) to register and cancel a
+registration.
 
 ### Demo Keycloak accounts
 
 | Username | Password | Roles |
 |---|---|---|
-| `organizer` | `organizer` | `USER`, `ORGANIZER` |
-| `organizer2` | `organizer2` | `USER`, `ORGANIZER` |
+| `ada.lovelace` | `ada` | `USER`, `ORGANIZER` |
+| `linus.torvalds` | `linus` | `USER`, `ORGANIZER` |
 | `user` | `user` | `USER` |
 | `anna.nowak` | `anna` | `USER` |
 | `piotr.kowalski` | `piotr` | `USER` |

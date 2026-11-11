@@ -28,6 +28,9 @@ The Event Service database and Keycloak database are separate ownership
 boundaries. Keycloak imports the local realm and demo users from
 `infrastructure/keycloak/eventhub-realm.json` into its database on first
 startup.
+The realm seed should contain authentication data only; display names,
+preferences, and other application profile data belong to the future User
+Profile Service.
 
 Do not add production passwords or secrets to source control. The local
 development defaults and demo credentials documented in
