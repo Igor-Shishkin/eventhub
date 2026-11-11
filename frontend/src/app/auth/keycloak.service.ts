@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import Keycloak from 'keycloak-js';
 
 @Injectable({
@@ -13,6 +13,7 @@ export class KeycloakService {
 
   readonly authenticated = signal(false);
   readonly username = signal<string | null>(null);
+  readonly organizer = computed(() => this.authenticated() && this.isOrganizer());
 
   async init(): Promise<boolean> {
     try {

@@ -234,6 +234,12 @@ JWT access tokens as an OAuth2 Resource Server, maps Keycloak realm roles to Spr
 roles, and derives the current user ID from the JWT `sub` claim. Organizer ownership is
 checked in the event application service rather than trusted from the request body.
 
+The current local Keycloak setup is intended for development only and does not yet use a
+dedicated persistent database. A planned infrastructure step is to run Keycloak with its
+own PostgreSQL database, separate from all business-service databases. Keycloak database
+credentials, backups, persistent storage, and deployment configuration must be managed as
+infrastructure concerns. Application services must not access this database directly.
+
 Keycloak remains responsible for identity infrastructure, while the planned User Profile
 Service will own application-level profile data. Profile data will be addressed by the
 opaque Keycloak subject ID and stored in a separate database. Business services must not

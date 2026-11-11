@@ -25,7 +25,7 @@
         </div>
 
         <div class="header-actions">
-          @if (item.status === 'DRAFT') {
+          @if (keycloak.organizer() && item.status === 'DRAFT') {
             <button
               type="button"
               class="btn btn-success"
@@ -35,7 +35,7 @@
             </button>
           }
 
-          @if (item.status === 'PUBLISHED') {
+          @if (keycloak.organizer() && item.status === 'PUBLISHED') {
             <button
               type="button"
               class="btn btn-danger"
@@ -69,4 +69,3 @@
     </article>
   }
 </div>
-

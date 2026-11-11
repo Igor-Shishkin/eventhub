@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { EventService } from '../../services/event.service';
 import { EventItem, EventStatus } from '../../models/event.model';
+import { KeycloakService } from '../../auth/keycloak.service';
 
 @Component({
   selector: 'app-event-list',
@@ -15,6 +16,7 @@ import { EventItem, EventStatus } from '../../models/event.model';
 export class EventListComponent implements OnInit {
   private readonly eventService = inject(EventService);
 
+  readonly keycloak = inject(KeycloakService);
   readonly events = signal<EventItem[]>([]);
   readonly loading = signal<boolean>(true);
   readonly errorMessage = signal<string | null>(null);

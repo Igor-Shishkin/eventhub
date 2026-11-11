@@ -4,9 +4,11 @@
       <h1 class="page-title">Events</h1>
       <p class="page-subtitle">Browse, publish, and manage events in EventHub</p>
     </div>
-    <a routerLink="/events/new" class="btn btn-primary">
-      + Create Event
-    </a>
+    @if (keycloak.organizer()) {
+      <a routerLink="/events/new" class="btn btn-primary">
+        + Create Event
+      </a>
+    }
   </header>
 
   <div class="toolbar">
@@ -68,7 +70,9 @@
       <div class="empty-icon">📅</div>
       <h3>No events found</h3>
       <p>No events match your search criteria.</p>
-      <a routerLink="/events/new" class="btn btn-primary">Create the first event</a>
+      @if (keycloak.organizer()) {
+        <a routerLink="/events/new" class="btn btn-primary">Create the first event</a>
+      }
     </div>
   } @else {
     <div class="events-grid">
@@ -107,7 +111,7 @@
             <span class="view-link">Details →</span>
 
             <div class="actions" (click)="$event.stopPropagation()">
-              @if (event.status === 'DRAFT') {
+              @if (keycloak.organizer() && event.status === 'DRAFT') {
                 <button
                   type="button"
                   class="btn btn-sm btn-success"
@@ -117,7 +121,7 @@
                 </button>
               }
 
-              @if (event.status === 'PUBLISHED') {
+              @if (keycloak.organizer() && event.status === 'PUBLISHED') {
                 <button
                   type="button"
                   class="btn btn-sm btn-danger"
@@ -133,4 +137,3 @@
     </div>
   }
 </div>
-
