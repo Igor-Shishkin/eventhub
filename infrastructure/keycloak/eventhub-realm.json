@@ -40,15 +40,13 @@
   ],
   "users": [
     {
-      "username": "organizer",
+      "id": "00000000-0000-4000-8000-000000000001",
+      "username": "ada.lovelace",
       "enabled": true,
-      "email": "organizer@example.com",
-      "firstName": "Demo",
-      "lastName": "Organizer",
       "credentials": [
         {
           "type": "password",
-          "value": "organizer",
+          "value": "ada",
           "temporary": false
         }
       ],
@@ -58,15 +56,152 @@
       ]
     },
     {
+      "id": "00000000-0000-4000-8000-000000000002",
+      "username": "linus.torvalds",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "linus",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER",
+        "ORGANIZER"
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000009",
+      "username": "guido.vanrossum",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "guido",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER",
+        "ORGANIZER"
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000010",
+      "username": "grace.hopper",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "grace",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER",
+        "ORGANIZER"
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000011",
+      "username": "margaret.hamilton",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "margaret",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER",
+        "ORGANIZER"
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000003",
       "username": "user",
       "enabled": true,
-      "email": "user@example.com",
-      "firstName": "Demo",
-      "lastName": "User",
       "credentials": [
         {
           "type": "password",
           "value": "user",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER"
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000004",
+      "username": "anna.nowak",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "anna",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER"
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000005",
+      "username": "piotr.kowalski",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "piotr",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER"
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000006",
+      "username": "maria.zielinska",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "maria",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER"
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000007",
+      "username": "pawel.lewandowski",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "pawel",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER"
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000008",
+      "username": "karolina.wojcik",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "karolina",
           "temporary": false
         }
       ],

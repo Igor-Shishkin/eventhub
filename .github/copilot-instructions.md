@@ -20,9 +20,15 @@ Before making significant changes, read:
 - Do not introduce new frameworks or dependencies without discussing them first.
 - Keep microservices independent and respect their data ownership.
 - Do not access another service's database directly.
+- Keycloak uses the separate `postgres-keycloak` database in local Compose;
+  services must use JWT validation rather than querying it.
+- Keep realm seed data limited to authentication identity and realm roles;
+  application profile fields belong to the future User Profile Service.
 - Prefer simple solutions over unnecessary abstractions.
 - Add tests for new business logic.
 - Update documentation when architectural decisions change.
+- The realm file is a first-start seed. After changing demo users or roles,
+  reset local volumes with `docker compose down -v` before validating again.
 - After each meaningful code change or development step, update `docs/PROJECT_CONTEXT.md` with the implemented behavior, validation status, and next steps; update `README.md` or other relevant documentation when setup or user-facing behavior changes.
 
 ## Development approach
