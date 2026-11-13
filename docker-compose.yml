@@ -37,6 +37,44 @@ services:
     networks:
       - eventhub-network
 
+  postgres-profile:
+    image: postgres:16-alpine
+    container_name: eventhub-postgres-profile
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: profile_service
+      POSTGRES_USER: profile_user
+      POSTGRES_PASSWORD: profile_password
+    ports:
+      - "5434:5432"
+    volumes:
+      - profile_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U profile_user -d profile_service"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - eventhub-network
+
+  profile-service:
+    profiles:
+      - apps
+    build:
+      context: ./profile-service
+      dockerfile: Dockerfile
+    container_name: eventhub-profile-service
+    ports:
+      - "8082:8082"
+    environment:
+      DB_HOST: postgres-profile
+      DB_PORT: 5432
+    depends_on:
+      postgres-profile:
+        condition: service_healthy
+    networks:
+      - eventhub-network
+
   postgres-keycloak:
     image: postgres:16-alpine
     container_name: eventhub-postgres-keycloak
@@ -86,4 +124,5 @@ networks:
 
 volumes:
   event_pgdata:
+  profile_pgdata:
   keycloak_pgdata:

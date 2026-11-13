@@ -44,7 +44,7 @@ The application is designed as a microservices-based system using event-driven c
 ### Planned Services
 
 - **Event Service** – manages events, schedules, and attendee registrations.
-- **User Profile Service** – manages application-level user profiles and avatars (planned).
+- **User Profile Service** – manages the authenticated user's application-level profile.
 - **Volunteer Service** – manages volunteer positions, availability, shifts, and assignments.
 - **Notification Service** – handles email notifications and reminders.
 - **Analytics Service** – consumes user activity events and generates statistics and insights.
@@ -91,6 +91,7 @@ eventhub/
 │   └── PROJECT_CONTEXT.md
 ├── frontend/
 ├── event-service/
+├── profile-service/
 ├── volunteer-service/
 ├── notification-service/
 ├── analytics-service/
@@ -109,7 +110,8 @@ eventhub/
 docker compose up -d
 ```
 This starts the infrastructure containers, including the Event Service
-PostgreSQL database, the dedicated Keycloak PostgreSQL database, and Keycloak.
+PostgreSQL database, the User Profile Service PostgreSQL database, the
+dedicated Keycloak PostgreSQL database, and Keycloak.
 On the initial startup, PostgreSQL automatically executes the Event Service
 initialization scripts located in `infrastructure/postgres/init/` to create the
 required tables and indexes. Keycloak imports the local `eventhub` realm and
@@ -151,8 +153,8 @@ database remains on `5432`. Set `KEYCLOAK_DB_PASSWORD` and
 defaults. These accounts and passwords are fictional and must not be reused
 outside local development.
 
-After that, start the Event Service and frontend as described below, then log
-in with one of the demo users. Use any organizer account to create or manage
+After that, start the Event Service, User Profile Service, and frontend as
+described below, then log in with one of the demo users. Use any organizer account to create or manage
 events and `user` (or another attendee) to register and cancel a registration.
 
 ### Demo Keycloak accounts
@@ -180,6 +182,13 @@ dedicated PostgreSQL database after the first realm import.
 ```
 The service connects to PostgreSQL on `localhost:5432` by default using credentials specified in `application.yaml` and `docker-compose.yml`.
 
+### 3. Run User Profile Service Locally
+```bash
+./profile-service/gradlew -p profile-service bootRun
+```
+The service connects to its separate PostgreSQL database on `localhost:5434`.
+Flyway applies the profile schema migrations on startup.
+
 ## CI/CD
 
 GitHub Actions validates every pull request and push to `main`:
@@ -188,14 +197,17 @@ GitHub Actions validates every pull request and push to `main`:
 - frontend dependencies are installed with `npm ci`, then Angular production build and headless browser tests run with Node.js 20;
 - Docker Compose configuration is validated with `docker compose config --quiet`.
 
-A version tag such as `v1.0.0` starts the release workflow. It builds `event-service/Dockerfile` and publishes the image to GitHub Container Registry as:
+A version tag such as `v1.0.0` starts the release workflow. It builds both service
+Dockerfiles and publishes the images to GitHub Container Registry as:
 
 ```text
 ghcr.io/igor-shishkin/eventhub-event-service:v1.0.0
 ghcr.io/igor-shishkin/eventhub-event-service:latest
+ghcr.io/igor-shishkin/eventhub-profile-service:v1.0.0
+ghcr.io/igor-shishkin/eventhub-profile-service:latest
 ```
 
-### 3. Run Frontend Locally
+### 4. Run Frontend Locally
 ```bash
 cd frontend
 npm install
@@ -205,7 +217,7 @@ The application will be accessible at `http://localhost:4200`. API requests to `
 
 ## Development Status
 
-**Current stage:** Stage 1 & 2 in progress – Event Service REST API & Frontend UI implemented.
+**Current stage:** Stage 2 in progress – Event Service, User Profile Service, and Frontend UI implemented.
 
 The project is being developed incrementally.
 
@@ -214,18 +226,19 @@ Planned development stages:
 1. Project setup and frontend development.
 2. Core backend microservices and REST APIs.
 3. Authentication and authorization with Keycloak, including local PostgreSQL persistence. **Implemented.**
-4. Asynchronous business communication using RabbitMQ.
-5. Event streaming and analytics using Apache Kafka.
-6. Docker containerization and Kubernetes deployment.
-7. Monitoring, logging, and distributed tracing.
-8. CI/CD and infrastructure automation.
+4. Initial User Profile Service with `GET/PUT /api/v1/me`. **Implemented.**
+5. Asynchronous business communication using RabbitMQ.
+6. Event streaming and analytics using Apache Kafka.
+7. Docker containerization and Kubernetes deployment.
+8. Monitoring, logging, and distributed tracing.
+9. CI/CD and infrastructure automation.
 
 Features and infrastructure components described as planned are not necessarily implemented yet.
 
 ## Documentation
 
 - [Project Context](docs/PROJECT_CONTEXT.md) – overall project goals, architecture, features, and technical decisions.
-- [User Profile Service](docs/architecture/USER_PROFILE_SERVICE.md) – planned profile, avatar, and ownership boundaries.
+- [User Profile Service](docs/architecture/USER_PROFILE_SERVICE.md) – profile ownership boundaries and current API.
 - [Copilot Instructions](.github/copilot-instructions.md) – guidelines for AI-assisted development.
 
 ## License

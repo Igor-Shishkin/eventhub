@@ -244,8 +244,8 @@ directly.
 The local realm seed keeps only authentication identity and realm roles;
 display names and preferences remain future User Profile Service data.
 
-Keycloak remains responsible for identity infrastructure, while the planned User Profile
-Service will own application-level profile data. Profile data will be addressed by the
+Keycloak remains responsible for identity infrastructure, while the User Profile
+Service owns application-level profile data. Profile data will be addressed by the
 opaque Keycloak subject ID and stored in a separate database. Business services must not
 depend on a synchronous profile lookup for their core write workflows.
 
@@ -343,7 +343,13 @@ eventhub/
 
 ## 12. Current Project Status
 
-**Status: Stage 1 & Stage 2 in progress – Event Service & Frontend UI implemented; initial CI/CD automation is in place.**
+**Status: Stage 2 in progress – Event Service, User Profile Service, and Frontend UI implemented; initial CI/CD automation is in place.**
+
+- `profile-service`:
+  - Owns the `user_profiles` table in a separate PostgreSQL database.
+  - Validates Keycloak JWTs and derives the current profile from `JWT.sub`.
+  - Provides lazy profile creation through `GET /api/v1/me` and updates through `PUT /api/v1/me`.
+  - Uses Flyway migrations and does not store passwords or tokens.
 
 - `event-service`:
   - Core domain models (`Event`, `EventRegistration`) with state transition logic.
@@ -360,7 +366,7 @@ eventhub/
   - Angular 18 standalone components styled with PrimeNG 18 and PrimeIcons (Aura preset).
   - Decomposed components: navbar, event list, event creation, event detail, attendee registrations (`EventRegistrationsComponent`), and event info card (`EventInfoCardComponent`).
   - Typed API service (`EventService`) integrated with reactive REST endpoints.
-  - Local development proxy (`proxy.conf.json`) forwarding `/api` calls to `http://localhost:8081` without requiring CORS on backend services.
+  - Local development proxy (`proxy.conf.json`) forwarding Event Service `/api` calls to `http://localhost:8081` and Profile Service `/api/v1/me` calls to `http://localhost:8082` without requiring CORS on backend services.
   - Karma/Jasmine unit tests with headless Chrome execution.
 
 - CI/CD:
@@ -374,7 +380,7 @@ eventhub/
   - The demo dataset and realm seed are created only for fresh volumes; use `docker compose down -v && docker compose up -d` to recreate them.
 
 - Next steps:
-  - Implement the User Profile Service as a separate vertical slice.
+  - Extend the User Profile Service with public profile summaries, privacy settings, and avatar metadata.
   - Add an outbox and integrate RabbitMQ (publishing business events like `EventPublished`, `EventRegistered`, `EventRegistrationCancelled`).
   - Volunteer Service implementation.
 

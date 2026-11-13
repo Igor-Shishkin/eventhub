@@ -1,0 +1,10 @@
+CREATE TABLE user_profiles (
+    user_id VARCHAR(255) PRIMARY KEY,
+    display_name VARCHAR(120),
+    bio VARCHAR(2000),
+    locale VARCHAR(32),
+    timezone VARCHAR(64),
+    email_notifications_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
