@@ -2,8 +2,10 @@
 
 ## Status
 
-Planned. This service is intentionally separate from the current Keycloak
-authentication work and will be implemented as a follow-up vertical slice.
+Initial vertical slice implemented. The service currently supports the authenticated
+user's application-level profile and has its own PostgreSQL database and Flyway
+migration history. Profile photos, public profiles, and profile events remain
+follow-up work.
 
 ## Responsibility
 
@@ -12,10 +14,8 @@ The User Profile Service owns application-level user information:
 - display name;
 - short biography;
 - locale and timezone;
-- avatar metadata;
-- notification preferences;
-- privacy and communication consents;
-- optional profile information used by other domains.
+- email notification preference;
+- future avatar metadata and privacy preferences.
 
 Keycloak remains the owner of authentication and identity infrastructure:
 
@@ -26,7 +26,7 @@ Keycloak remains the owner of authentication and identity infrastructure:
 - identity-provider integration;
 - coarse-grained realm roles.
 
-The profile service must never store user passwords, refresh tokens, or access tokens.
+The profile service never stores passwords, refresh tokens, or access tokens.
 
 ## Identity reference
 
@@ -37,81 +37,61 @@ profile.userId = JWT.sub
 ```
 
 The user ID is treated as an opaque string. Email addresses and usernames are not
-used as primary keys because they may change.
-
-The service derives the current user from the validated JWT. A client must not be
-allowed to choose the `userId` of the profile being modified.
+used as primary keys because they may change. The current user is always derived
+from the validated JWT; clients cannot choose the profile owner.
 
 ## Initial API
 
-The first version should focus on the current user:
-
 ```text
-GET  /api/v1/me
-PUT  /api/v1/me
-POST /api/v1/me/photo
-DELETE /api/v1/me/photo
+GET /api/v1/me
+PUT /api/v1/me
 ```
 
-Administrative profile management can be added later if a real use case requires it.
+`GET /api/v1/me` lazily creates a minimal profile when the authenticated user has
+not used the service before. `PUT /api/v1/me` updates only the profile belonging
+to the current JWT subject.
+
+The initial response contains:
+
+- `userId`;
+- `displayName`;
+- `bio`;
+- `locale`;
+- `timezone`;
+- `emailNotificationsEnabled`;
+- `createdAt` and `updatedAt`.
+
+The `userId` is returned only as the current user's opaque identity. It is not a
+public profile identifier and must not be displayed as a user-facing name.
 
 ## Data ownership
 
-The service owns its own database and profile schema. Other services store only
-the opaque `userId` reference.
+The service owns the `user_profiles` table in the separate `profile_service`
+database. Flyway applies migrations from `profile-service/src/main/resources/db/migration`.
+Other services may store the opaque `userId` reference but must not access this
+database directly.
 
-The Event Service should not synchronously call the Profile Service during event
-registration. Registration must remain available even if profile reads or image
-storage are temporarily unavailable.
+The Event Service must not synchronously call the Profile Service during event
+registration. Registration remains available when profile reads are unavailable.
+If event attendee lists later need display data, use API composition, a local
+read model, or a deliberately designed public-profile endpoint.
 
-If another service needs display data, possible approaches are:
+## Local development
 
-1. fetch the profile separately at the API composition layer;
-2. maintain a small local read model from profile events;
-3. store a deliberately named snapshot when the business operation requires one.
+Docker Compose exposes the profile database on host port `5434` and the profile
+service on `8082`:
 
-Cross-service database access is not allowed.
-
-## Profile photo
-
-The database should store photo metadata and an object key, not the image bytes:
-
-```text
-photoObjectKey
-photoContentType
-photoUpdatedAt
+```bash
+docker compose up -d postgres-profile keycloak
+./profile-service/gradlew -p profile-service bootRun
 ```
 
-For local development, MinIO can provide S3-compatible object storage. Production
-can use S3 or another compatible object store without changing the profile domain.
+The Angular development proxy sends `/api/v1/me` to the profile service and other
+`/api` requests to the Event Service.
 
-The first implementation may accept multipart uploads through the Profile Service.
-Presigned upload URLs can be introduced later when the upload path needs to scale.
+## Follow-up implementation order
 
-## Integration events
-
-Potential events:
-
-- `UserProfileCreated`;
-- `UserProfileUpdated`;
-- `UserPhotoUpdated`;
-- `UserNotificationPreferencesChanged`.
-
-Consumers should be idempotent. Events should contain the profile ID and changed
-business data, but never credentials or tokens.
-
-Profile creation can initially be lazy: the first authenticated `GET /me` creates
-a minimal profile if one does not exist. This avoids coupling the service to
-Keycloak's internal database or administrative API.
-
-## Implementation order
-
-1. Create the service with its own PostgreSQL schema and migrations.
-2. Add JWT validation and `GET/PUT /api/v1/me`.
-3. Add profile tests and API contract documentation.
-4. Add MinIO and photo upload/delete.
-5. Add integration events.
-6. Add profile read models or API composition only where a product feature needs them.
-
-The service should be introduced after the Keycloak PR is verified and before
-features that require user preferences or richer volunteer profiles.
+1. Add public profile summaries and explicit profile/attendance visibility settings.
+2. Add avatar metadata and MinIO-backed photo upload/delete.
+3. Add profile integration events with idempotent consumers.
+4. Add API composition or read models only when another product feature needs them.

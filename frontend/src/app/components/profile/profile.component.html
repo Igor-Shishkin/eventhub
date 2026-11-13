@@ -1,0 +1,65 @@
+<div class="page-container">
+  <div class="navigation-bar">
+    <a routerLink="/events" class="back-link">← Back to events</a>
+  </div>
+
+  @if (loading()) {
+    <div class="state-box">
+      <div class="spinner"></div>
+      <p>Loading your profile...</p>
+    </div>
+  } @else {
+    <div class="form-card">
+      <header class="form-header">
+        <h1 class="form-title">My profile</h1>
+        <p class="form-subtitle">Manage the application profile associated with your account.</p>
+      </header>
+
+      @if (errorMessage()) {
+        <p-message severity="error" [text]="errorMessage()!" styleClass="w-full mb-3"></p-message>
+      }
+      @if (successMessage()) {
+        <p-message severity="success" [text]="successMessage()!" styleClass="w-full mb-3"></p-message>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="profile-form">
+        <div class="form-group">
+          <label for="displayName" class="form-label">Display name</label>
+          <input id="displayName" pInputText type="text" formControlName="displayName" class="w-full" />
+          @if (form.controls.displayName.touched && form.controls.displayName.errors?.['maxlength']) {
+            <span class="error-text">Display name cannot exceed 120 characters.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="bio" class="form-label">Short bio</label>
+          <textarea id="bio" pTextarea rows="5" formControlName="bio" class="w-full" [autoResize]="true"></textarea>
+          @if (form.controls.bio.touched && form.controls.bio.errors?.['maxlength']) {
+            <span class="error-text">Bio cannot exceed 2000 characters.</span>
+          }
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col">
+            <label for="locale" class="form-label">Locale</label>
+            <input id="locale" pInputText type="text" formControlName="locale" placeholder="e.g. en-GB" class="w-full" />
+          </div>
+          <div class="form-group col">
+            <label for="timezone" class="form-label">Timezone</label>
+            <input id="timezone" pInputText type="text" formControlName="timezone" placeholder="e.g. Europe/Warsaw" class="w-full" />
+          </div>
+        </div>
+
+        <label class="checkbox-row">
+          <p-checkbox formControlName="emailNotificationsEnabled" [binary]="true" inputId="emailNotificationsEnabled"></p-checkbox>
+          <span>Enable email notifications</span>
+        </label>
+
+        <div class="form-actions">
+          <p-button routerLink="/events" label="Cancel" [outlined]="true" severity="secondary"></p-button>
+          <p-button type="submit" label="Save profile" icon="pi pi-check" [loading]="saving()" [disabled]="saving()"></p-button>
+        </div>
+      </form>
+    </div>
+  }
+</div>
