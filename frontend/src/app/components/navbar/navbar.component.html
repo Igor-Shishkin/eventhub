@@ -18,6 +18,15 @@
       @if (keycloak.authenticated()) {
         <span class="user-name">{{ keycloak.username() }}</span>
 
+        <p-button
+          routerLink="/profile"
+          label="Profile"
+          icon="pi pi-user"
+          [text]="true"
+          severity="contrast"
+          size="small">
+        </p-button>
+
         @if (keycloak.isOrganizer()) {
           <p-button
             routerLink="/events/new"

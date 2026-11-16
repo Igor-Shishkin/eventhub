@@ -39,6 +39,29 @@ jobs:
       - name: Run backend tests
         run: ./gradlew test --no-daemon
 
+  profile:
+    name: Profile service tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: profile-service
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: gradle
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run profile service tests
+        run: ./gradlew test --no-daemon
+
   frontend:
     name: Frontend build and tests
     runs-on: ubuntu-latest
