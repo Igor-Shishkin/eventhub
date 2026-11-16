@@ -89,9 +89,41 @@ docker compose up -d postgres-profile keycloak
 The Angular development proxy sends `/api/v1/me` to the profile service and other
 `/api` requests to the Event Service.
 
+### Local demo-data seeding (planned next step)
+
+Demo data must not be loaded by a plain `docker compose up`. The planned
+approach is a one-shot `demo-seeder` container enabled only through an explicit
+Compose profile (this is a Compose activation label, not the Profile Service),
+for example:
+
+```bash
+docker compose --profile seed-data up demo-seeder
+```
+
+The seeder should orchestrate separate, idempotent seed scripts for the Event
+Service and Profile Service. It must wait until the relevant databases and
+service migrations are ready, then insert only local demo data. It must not
+write directly to the Keycloak database; Keycloak continues to import the
+development realm and users through `infrastructure/keycloak/eventhub-realm.json`.
+
+Suggested layout:
+
+```text
+infrastructure/seed/
+├── event-service/
+│   └── 01-demo-events.sql
+├── profile-service/
+│   └── 01-demo-profiles.sql
+└── seed.sh
+```
+
+The Profile Service schema remains owned by the service and must continue to be
+created by Flyway. The seeder adds data only after the migrations have run.
+
 ## Follow-up implementation order
 
-1. Add public profile summaries and explicit profile/attendance visibility settings.
-2. Add avatar metadata and MinIO-backed photo upload/delete.
-3. Add profile integration events with idempotent consumers.
-4. Add API composition or read models only when another product feature needs them.
+1. Add the explicit `seed` Compose profile and one-shot `demo-seeder`.
+2. Add public profile summaries and explicit profile/attendance visibility settings.
+3. Add avatar metadata and MinIO-backed photo upload/delete.
+4. Add profile integration events with idempotent consumers.
+5. Add API composition or read models only when another product feature needs them.
