@@ -13,12 +13,12 @@ class UserProfileService(
 
     override suspend fun getOrCreateProfile(userId: String): UserProfile {
         return profileRepository.findByUserId(userId)
-            ?: profileRepository.save(UserProfile(userId = userId))
+            ?: profileRepository.create(UserProfile(userId = userId))
     }
 
     override suspend fun updateProfile(command: UpdateProfileCommand): UserProfile {
         val current = getOrCreateProfile(command.userId)
-        return profileRepository.save(
+        return profileRepository.update(
             current.update(
                 displayName = command.displayName,
                 bio = command.bio,

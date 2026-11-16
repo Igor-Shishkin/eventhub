@@ -4,5 +4,6 @@ import com.eventhub.profileservice.domain.model.UserProfile
 
 interface UserProfileRepositoryPort {
     suspend fun findByUserId(userId: String): UserProfile?
-    suspend fun save(profile: UserProfile): UserProfile
+    suspend fun create(profile: UserProfile): UserProfile
+    suspend fun update(profile: UserProfile): UserProfile
 }

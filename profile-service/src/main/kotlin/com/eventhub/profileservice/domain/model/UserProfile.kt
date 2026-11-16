@@ -49,7 +49,7 @@ data class UserProfile(
         updatedAt = Instant.now()
     )
 
-    fun toEntity(): UserProfileEntity = UserProfileEntity(
+    fun toEntity(isNew: Boolean = false): UserProfileEntity = UserProfileEntity(
         userId = userId,
         displayName = displayName,
         bio = bio,
@@ -57,6 +57,7 @@ data class UserProfile(
         timezone = timezone,
         emailNotificationsEnabled = emailNotificationsEnabled,
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+        newEntity = isNew
     )
 }

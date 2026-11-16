@@ -18,13 +18,13 @@ class UserProfileServiceTest {
     @Test
     fun `should lazily create profile when it does not exist`() = runTest {
         coEvery { repository.findByUserId("user-1") } returns null
-        coEvery { repository.save(any()) } answers { firstArg() }
+        coEvery { repository.create(any()) } answers { firstArg() }
 
         val result = service.getOrCreateProfile("user-1")
 
         assertEquals("user-1", result.userId)
         assertEquals(null, result.displayName)
-        coVerify(exactly = 1) { repository.save(match { it.userId == "user-1" }) }
+        coVerify(exactly = 1) { repository.create(match { it.userId == "user-1" }) }
     }
 
     @Test
@@ -35,14 +35,14 @@ class UserProfileServiceTest {
         val result = service.getOrCreateProfile("user-1")
 
         assertEquals(existing, result)
-        coVerify(exactly = 0) { repository.save(any()) }
+        coVerify(exactly = 0) { repository.create(any()) }
     }
 
     @Test
     fun `should update existing profile`() = runTest {
         val existing = UserProfile(userId = "user-1")
         coEvery { repository.findByUserId("user-1") } returns existing
-        coEvery { repository.save(any()) } answers { firstArg() }
+        coEvery { repository.update(any()) } answers { firstArg() }
 
         val result = service.updateProfile(
             UpdateProfileCommand(
@@ -58,6 +58,6 @@ class UserProfileServiceTest {
         assertEquals("Ada", result.displayName)
         assertEquals("Organizer", result.bio)
         assertEquals(false, result.emailNotificationsEnabled)
-        coVerify(exactly = 1) { repository.save(match { it.displayName == "Ada" }) }
+        coVerify(exactly = 1) { repository.update(match { it.displayName == "Ada" }) }
     }
 }
