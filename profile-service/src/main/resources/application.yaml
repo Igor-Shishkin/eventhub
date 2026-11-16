@@ -21,6 +21,9 @@ spring:
     username: ${DB_USER:profile_user}
     password: ${DB_PASSWORD:profile_password}
   flyway:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5434}/${DB_NAME:profile_service}
+    user: ${DB_USER:profile_user}
+    password: ${DB_PASSWORD:profile_password}
     locations: classpath:db/migration
   security:
     oauth2:
