@@ -71,6 +71,11 @@ database. Flyway applies migrations from `profile-service/src/main/resources/db/
 Other services may store the opaque `userId` reference but must not access this
 database directly.
 
+User creation is intentionally not replicated into every service database.
+Keycloak owns the identity record; the Profile Service owns the application
+profile. Until registration events are introduced, the service uses lazy profile
+creation on the first authenticated profile request.
+
 The Event Service must not synchronously call the Profile Service during event
 registration. Registration remains available when profile reads are unavailable.
 If event attendee lists later need display data, use API composition, a local
@@ -125,5 +130,9 @@ created by Flyway. The seeder adds data only after the migrations have run.
 1. Add the explicit `seed` Compose profile and one-shot `demo-seeder`.
 2. Add public profile summaries and explicit profile/attendance visibility settings.
 3. Add avatar metadata and MinIO-backed photo upload/delete.
-4. Add profile integration events with idempotent consumers.
-5. Add API composition or read models only when another product feature needs them.
+4. Add a `UserRegistered` RabbitMQ event and an idempotent Profile Service
+   consumer that creates a minimal profile. Keep lazy creation as a fallback
+   for delayed or missed delivery. Keycloak will need an event bridge, listener
+   SPI, or registration backend integration to publish the event.
+5. Add profile integration events with idempotent consumers.
+6. Add API composition or read models only when another product feature needs them.
