@@ -177,6 +177,10 @@ RabbitMQ and Kafka have separate responsibilities.
 
 ### 6.1 RabbitMQ – Business Communication
 
+The first implemented RabbitMQ slice connects Event Service registrations to the
+Notification Service. The current publisher is intentionally direct; a
+Transactional Outbox is still required for reliable production delivery.
+
 Used for:
 - Asynchronous communication between microservices.
 - Notification processing.
@@ -184,6 +188,7 @@ Used for:
 - Volunteer assignment-related tasks.
 
 Example events:
+- `EventRegistrationCreated`
 - `EventPublished`
 - `VolunteerScheduleGenerated`
 - `NotificationRequested`

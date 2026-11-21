@@ -8,6 +8,7 @@ import com.eventhub.eventservice.domain.model.Event
 import com.eventhub.eventservice.domain.model.EventRegistration
 import com.eventhub.eventservice.domain.model.EventStatus
 import com.eventhub.eventservice.domain.model.RegistrationStatus
+import com.eventhub.eventservice.application.port.out.EventRegistrationEventPublisherPort
 import com.eventhub.eventservice.domain.port.EventRegistrationRepositoryPort
 import com.eventhub.eventservice.domain.port.EventRepositoryPort
 import io.mockk.clearMocks
@@ -29,7 +30,8 @@ class EventRegistrationServiceTest {
 
     private val eventRepository: EventRepositoryPort = mockk()
     private val registrationRepository: EventRegistrationRepositoryPort = mockk()
-    private val registrationService = EventRegistrationService(eventRepository, registrationRepository)
+    private val eventPublisher: EventRegistrationEventPublisherPort = mockk(relaxed = true)
+    private val registrationService = EventRegistrationService(eventRepository, registrationRepository, eventPublisher)
 
     private val now = Instant.parse("2026-05-01T12:00:00Z")
     private val eventId = UUID.randomUUID()
@@ -45,7 +47,7 @@ class EventRegistrationServiceTest {
 
     @BeforeEach
     fun setUp() {
-        clearMocks(eventRepository, registrationRepository)
+        clearMocks(eventRepository, registrationRepository, eventPublisher)
     }
 
     @Test
@@ -63,6 +65,7 @@ class EventRegistrationServiceTest {
         assertEquals(userId, result.userId)
         assertEquals(RegistrationStatus.REGISTERED, result.status)
         coVerify(exactly = 1) { registrationRepository.save(match { it.eventId == eventId && it.userId == userId }) }
+        coVerify(exactly = 1) { eventPublisher.publish(match { it.eventId == eventId && it.userId == userId && it.eventTitle == publishedEvent.title }) }
     }
 
     @Test
@@ -73,6 +76,7 @@ class EventRegistrationServiceTest {
             registrationService.registerAttendee(RegisterAttendeeCommand(eventId, userId))
         }
         coVerify(exactly = 0) { registrationRepository.save(any()) }
+        coVerify(exactly = 0) { eventPublisher.publish(any()) }
     }
 
     @Test
@@ -85,6 +89,7 @@ class EventRegistrationServiceTest {
         }
         assertEquals("Cannot register for an event that is not PUBLISHED (current status: DRAFT)", ex.message)
         coVerify(exactly = 0) { registrationRepository.save(any()) }
+        coVerify(exactly = 0) { eventPublisher.publish(any()) }
     }
 
     @Test
@@ -103,6 +108,7 @@ class EventRegistrationServiceTest {
         }
         assertEquals("User '$userId' is already registered for event '$eventId'", ex.message)
         coVerify(exactly = 0) { registrationRepository.save(any()) }
+        coVerify(exactly = 0) { eventPublisher.publish(any()) }
     }
 
     @Test

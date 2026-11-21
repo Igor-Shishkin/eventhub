@@ -45,12 +45,20 @@ The application is designed as a microservices-based system using event-driven c
 
 - **Event Service** – manages events, schedules, and attendee registrations.
 - **Volunteer Service** – manages volunteer positions, availability, shifts, and assignments.
-- **Notification Service** – handles email notifications and reminders.
+- **Notification Service** – consumes business events and handles email notifications and reminders.
 - **Analytics Service** – consumes user activity events and generates statistics and insights.
 - **API Gateway** – provides a single entry point to backend services.
 - **Keycloak** – handles authentication and authorization.
 
 ### Messaging & Event Streaming
+
+RabbitMQ is available in the local Docker Compose setup. The first implemented
+workflow publishes `EventRegistrationCreated` from the Event Service and consumes
+it in the Notification Service. The consumer currently logs a confirmation; a
+real delivery provider and Transactional Outbox are planned follow-ups. See
+[RabbitMQ messaging documentation](docs/messaging/RABBITMQ.md) for the topology
+and local commands.
+
 
 The project uses two messaging technologies for different purposes:
 
@@ -98,6 +106,11 @@ eventhub/
 ```
 
 ## Quick Start
+
+RabbitMQ local infrastructure is included in Docker Compose. The management UI
+is available at `http://localhost:15672` with the development credentials
+`eventhub` / `eventhub_password`.
+
 
 ### Prerequisites
 - Docker & Docker Compose

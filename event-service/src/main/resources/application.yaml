@@ -7,6 +7,11 @@ spring:
     timeout-per-shutdown-phase: 20s
   application:
     name: event-service
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:eventhub}
+    password: ${RABBITMQ_PASSWORD:eventhub_password}
   r2dbc:
     url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:event_service}
     username: ${DB_USER:event_user}
@@ -32,3 +37,9 @@ management:
           include: readinessState,r2dbc
 
 
+
+app:
+  messaging:
+    rabbitmq:
+      exchange: ${RABBITMQ_EXCHANGE:eventhub.business}
+      event-registration-routing-key: ${RABBITMQ_EVENT_REGISTRATION_ROUTING_KEY:event.registration-created.v1}

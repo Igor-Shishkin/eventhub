@@ -1,4 +1,24 @@
 services:
+  rabbitmq:
+    image: rabbitmq:4.1-management-alpine
+    container_name: eventhub-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-eventhub}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-eventhub_password}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - eventhub-network
+
   postgres-event:
     image: postgres:16-alpine
     container_name: eventhub-postgres-event
@@ -20,6 +40,26 @@ services:
     networks:
       - eventhub-network
 
+  notification-service:
+    profiles:
+      - apps
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: eventhub-notification-service
+    ports:
+      - "8083:8083"
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-eventhub}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-eventhub_password}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - eventhub-network
+
   event-service:
     profiles:
       - apps
@@ -31,8 +71,14 @@ services:
       - "8081:8081"
     environment:
       DB_HOST: postgres-event
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-eventhub}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-eventhub_password}
     depends_on:
       postgres-event:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     networks:
       - eventhub-network
@@ -43,5 +89,6 @@ networks:
 
 volumes:
   event_pgdata:
+  rabbitmq_data:
 
 

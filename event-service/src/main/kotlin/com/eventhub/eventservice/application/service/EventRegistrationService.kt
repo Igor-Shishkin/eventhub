@@ -8,8 +8,10 @@ import com.eventhub.eventservice.domain.exception.RegistrationNotFoundException
 import com.eventhub.eventservice.domain.model.EventRegistration
 import com.eventhub.eventservice.domain.model.EventStatus
 import com.eventhub.eventservice.domain.model.RegistrationStatus
+import com.eventhub.eventservice.application.port.out.EventRegistrationEventPublisherPort
 import com.eventhub.eventservice.domain.port.EventRegistrationRepositoryPort
 import com.eventhub.eventservice.domain.port.EventRepositoryPort
+import com.eventhub.eventservice.application.port.out.EventRegistrationCreatedMessage
 import kotlinx.coroutines.flow.Flow
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -17,7 +19,8 @@ import java.util.UUID
 @Service
 class EventRegistrationService(
     private val eventRepository: EventRepositoryPort,
-    private val registrationRepository: EventRegistrationRepositoryPort
+    private val registrationRepository: EventRegistrationRepositoryPort,
+    private val eventPublisher: EventRegistrationEventPublisherPort
 ) : EventRegistrationUseCase {
 
     override suspend fun registerAttendee(command: RegisterAttendeeCommand): EventRegistration {
@@ -41,7 +44,18 @@ class EventRegistrationService(
             )
         }
 
-        return registrationRepository.save(registrationToSave)
+        val savedRegistration = registrationRepository.save(registrationToSave)
+        eventPublisher.publish(
+            EventRegistrationCreatedMessage(
+                eventId = requireNotNull(event.id),
+                registrationId = requireNotNull(savedRegistration.id),
+                userId = savedRegistration.userId,
+                eventTitle = event.title,
+                eventStartTime = event.startTime,
+                registeredAt = savedRegistration.registeredAt
+            )
+        )
+        return savedRegistration
     }
 
     override suspend fun cancelRegistration(command: CancelRegistrationCommand): EventRegistration {
