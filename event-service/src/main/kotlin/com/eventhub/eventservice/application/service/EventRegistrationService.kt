@@ -3,15 +3,15 @@ package com.eventhub.eventservice.application.service
 import com.eventhub.eventservice.application.port.`in`.CancelRegistrationCommand
 import com.eventhub.eventservice.application.port.`in`.EventRegistrationUseCase
 import com.eventhub.eventservice.application.port.`in`.RegisterAttendeeCommand
+import com.eventhub.eventservice.application.port.out.EventRegistrationCreatedMessage
+import com.eventhub.eventservice.application.port.out.EventRegistrationEventPublisherPort
 import com.eventhub.eventservice.domain.exception.EventNotFoundException
 import com.eventhub.eventservice.domain.exception.RegistrationNotFoundException
+import com.eventhub.eventservice.domain.model.Event
 import com.eventhub.eventservice.domain.model.EventRegistration
 import com.eventhub.eventservice.domain.model.EventStatus
-import com.eventhub.eventservice.domain.model.RegistrationStatus
-import com.eventhub.eventservice.application.port.out.EventRegistrationEventPublisherPort
 import com.eventhub.eventservice.domain.port.EventRegistrationRepositoryPort
 import com.eventhub.eventservice.domain.port.EventRepositoryPort
-import com.eventhub.eventservice.application.port.out.EventRegistrationCreatedMessage
 import kotlinx.coroutines.flow.Flow
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -24,38 +24,47 @@ class EventRegistrationService(
 ) : EventRegistrationUseCase {
 
     override suspend fun registerAttendee(command: RegisterAttendeeCommand): EventRegistration {
-        val event = eventRepository.findById(command.eventId)
-            ?: throw EventNotFoundException(command.eventId)
+        val event = findPublishedEvent(command.eventId)
+        val registration = prepareRegistration(command)
+        val savedRegistration = registrationRepository.save(registration)
 
-        check(event.status == EventStatus.PUBLISHED) {
-            "Cannot register for an event that is not PUBLISHED (current status: ${event.status})"
-        }
+        publishRegistrationCreated(event, savedRegistration)
 
-        val existingRegistration = registrationRepository.findByEventIdAndUserId(command.eventId, command.userId)
-        val registrationToSave = if (existingRegistration != null) {
-            check(existingRegistration.status != RegistrationStatus.REGISTERED) {
-                "User '${command.userId}' is already registered for event '${command.eventId}'"
+        return savedRegistration
+    }
+
+    private suspend fun findPublishedEvent(eventId: UUID) =
+        eventRepository.findById(eventId)
+            ?.also { event ->
+                check(event.status == EventStatus.PUBLISHED) {
+                    "Cannot register for an event that is not PUBLISHED (current status: ${event.status})"
+                }
             }
-            existingRegistration.reRegister()
-        } else {
-            EventRegistration(
-                eventId = command.eventId,
-                userId = command.userId
-            )
-        }
+            ?: throw EventNotFoundException(eventId)
 
-        val savedRegistration = registrationRepository.save(registrationToSave)
+    private suspend fun prepareRegistration(command: RegisterAttendeeCommand): EventRegistration {
+        val existing = registrationRepository.findByEventIdAndUserId(command.eventId, command.userId)
+        return EventRegistration.createOrReRegister(
+            eventId = command.eventId,
+            userId = command.userId,
+            existing = existing
+        )
+    }
+
+    private suspend fun publishRegistrationCreated(
+        event: Event,
+        registration: EventRegistration
+    ) {
         eventPublisher.publish(
             EventRegistrationCreatedMessage(
                 eventId = requireNotNull(event.id),
-                registrationId = requireNotNull(savedRegistration.id),
-                userId = savedRegistration.userId,
+                registrationId = requireNotNull(registration.id),
+                userId = registration.userId,
                 eventTitle = event.title,
                 eventStartTime = event.startTime,
-                registeredAt = savedRegistration.registeredAt
+                registeredAt = registration.registeredAt
             )
         )
-        return savedRegistration
     }
 
     override suspend fun cancelRegistration(command: CancelRegistrationCommand): EventRegistration {

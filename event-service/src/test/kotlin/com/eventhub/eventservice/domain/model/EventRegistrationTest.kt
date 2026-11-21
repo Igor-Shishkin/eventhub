@@ -23,6 +23,54 @@ class EventRegistrationTest {
     }
 
     @Test
+    fun `should create new registration when no existing registration exists`() {
+        val eventId = UUID.randomUUID()
+
+        val registration = EventRegistration.createOrReRegister(
+            eventId = eventId,
+            userId = "user-123",
+            existing = null
+        )
+
+        assertEquals(eventId, registration.eventId)
+        assertEquals("user-123", registration.userId)
+        assertEquals(RegistrationStatus.REGISTERED, registration.status)
+    }
+
+    @Test
+    fun `should re-register cancelled registration through factory`() {
+        val existing = EventRegistration(
+            eventId = UUID.randomUUID(),
+            userId = "user-123",
+            status = RegistrationStatus.CANCELLED
+        )
+
+        val reRegistered = EventRegistration.createOrReRegister(
+            eventId = existing.eventId,
+            userId = existing.userId,
+            existing = existing
+        )
+
+        assertEquals(RegistrationStatus.REGISTERED, reRegistered.status)
+    }
+
+    @Test
+    fun `should reject creating duplicate registration through factory`() {
+        val existing = EventRegistration(
+            eventId = UUID.randomUUID(),
+            userId = "user-123"
+        )
+
+        assertThrows<IllegalStateException> {
+            EventRegistration.createOrReRegister(
+                eventId = existing.eventId,
+                userId = existing.userId,
+                existing = existing
+            )
+        }
+    }
+
+    @Test
     fun `should throw exception when user id is blank`() {
         assertThrows<IllegalArgumentException> {
             EventRegistration(

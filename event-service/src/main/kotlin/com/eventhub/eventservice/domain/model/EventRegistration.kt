@@ -11,6 +11,23 @@ data class EventRegistration(
     val status: RegistrationStatus = RegistrationStatus.REGISTERED,
     val registeredAt: Instant = Instant.now()
 ) {
+    companion object {
+        fun createOrReRegister(
+            eventId: UUID,
+            userId: String,
+            existing: EventRegistration?
+        ): EventRegistration = when {
+            existing == null -> EventRegistration(
+                eventId = eventId,
+                userId = userId
+            )
+
+            existing.status == RegistrationStatus.CANCELLED -> existing.reRegister()
+
+            else -> error("User '$userId' is already registered for event '$eventId'")
+        }
+    }
+
     init {
         require(userId.isNotBlank()) { "User ID cannot be blank" }
     }
