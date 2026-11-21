@@ -1,0 +1,6 @@
+package com.eventhub.profileservice.infrastructure.persistence.repository
+
+import com.eventhub.profileservice.infrastructure.persistence.entity.UserProfileEntity
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+
+interface SpringDataUserProfileRepository : CoroutineCrudRepository<UserProfileEntity, String>
