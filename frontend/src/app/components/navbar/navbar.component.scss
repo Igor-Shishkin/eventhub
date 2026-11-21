@@ -40,3 +40,20 @@
   color: #cbd5e1;
   font-size: 0.875rem;
 }
+
+:host ::ng-deep .nav-action.p-button {
+  color: #e2e8f0;
+  border-color: #64748b;
+  background: transparent;
+}
+
+:host ::ng-deep .nav-action.p-button:hover {
+  color: #ffffff;
+  border-color: #93c5fd;
+  background: #1e293b;
+}
+
+:host ::ng-deep .nav-action.p-button:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
